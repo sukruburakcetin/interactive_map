@@ -67,6 +67,12 @@
                 layer = e.layer;
             if (type === 'marker') {
                 // Do something with the marker here, e.g. send it to the server
+                var latlng = layer.getLatLng();
+                // layer.bindPopup('<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
+                var locationName = prompt("Please enter the location name:", "");
+
+                // Add the location name to the marker popup
+                layer.bindPopup("Location: " + locationName + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
                 console.log(layer.toGeoJSON());
         $.ajax({
             url: '/save-points',
