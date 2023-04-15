@@ -27,6 +27,21 @@
             maxZoom: 19,
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
         }).addTo(map);
+        $.getJSON('/static/fatih.geojson', function(data) {
+            console.log(data); // log the GeoJSON data
+            // create a new GeoJSON layer and add it to the map
+            var fatihLayer = L.geoJSON(data, {
+                style: function(feature) {
+                    return {
+                        color: '#000',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.2 // try changing this value
+                    };
+                }
+            }).addTo(map);
+            console.log(fatihLayer); // log the Istanbul city borders layer
+        });
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
         var drawControl = new L.Control.Draw({
@@ -61,6 +76,7 @@
             dataType: 'json',
             success: function(response) {
                 console.log(response);
+                L.geoJSON(response).addTo(map);
             },
             error: function(error) {
                 console.log(error);
