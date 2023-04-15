@@ -1,5 +1,3 @@
-import os
-
 import requests
 from flask import Flask, render_template, request, jsonify
 from shapely import Point
@@ -11,22 +9,6 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     return render_template("index.html")
-
-
-"""get geojson from url and save to static folder"""
-
-
-# @app.route('/fatih-geojson', methods=["GET"])
-# def get_fatih_geojson():
-#     url = 'https://github.com/sukruburakcetin/interactive_map/blob/main/templates/fatih.geojson?raw=true'
-#     response = requests.get(url)
-#     if response.status_code == 200:
-#         filepath = os.path.join(app.static_folder, 'fatih.geojson')
-#         with open(filepath, 'wb') as f:
-#             f.write(response.content)
-#         return jsonify({'success': True})
-#     else:
-#         return jsonify({'success': False})
 
 
 @app.route("/save-points", methods=["POST"])
@@ -57,20 +39,6 @@ def save_points():
         print('Polygon is not within the Faith GeoJSON boundaries')
         # Return an error response
         return jsonify({'error': 'Polygon is not within the Faith GeoJSON boundaries'})
-
-
-
-    # """Convert the Shapely Polygon object to a GeoJSON Feature object"""
-    # feature = {
-    #     'type': 'Feature',
-    #     'geometry': {
-    #         'type': 'Polygon',
-    #         'coordinates': [list(polygon.exterior.coords)]
-    #     }
-    # }
-    # print(jsonify(feature))
-    # # Return the GeoJSON Feature object as a JSON response
-    # return jsonify(feature)
 
 
 if __name__ == "__main__":
