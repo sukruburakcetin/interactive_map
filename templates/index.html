@@ -21,7 +21,6 @@
     </style>
 <body>
     <div id="map" ></div>
-<!--    <button id="compare-btn">Compare Markers</button>-->
     <script>
         var map = L.map('map').setView([41.008806, 28.980162], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -41,8 +40,9 @@
                     };
                 }
             }).addTo(map);
-            console.log(fatihLayer); // log the fatih city borders layer
+            console.log(fatihLayer); // log the fatih district borders layer
         });
+
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
         var drawControl = new L.Control.Draw({
@@ -63,8 +63,8 @@
             }
         });
         map.addControl(drawControl);
+
         let locationValuesList = [];
-        var compareButtonAdded = false; // flag to check if compare button is already added
 
         map.on('draw:created', function (e) {
             var type = e.layerType,
@@ -72,7 +72,6 @@
             if (type === 'marker') {
                 // Do something with the marker here, e.g. send it to the server
                 var latlng = layer.getLatLng();
-                // layer.bindPopup('<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
                 var locationValues = prompt("Please enter the location value:", "");
 
                 // Add the location name to the marker popup
