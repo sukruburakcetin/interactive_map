@@ -20,7 +20,7 @@ def save_points():
     point = Point(points['geometry']['coordinates'][0], points['geometry']['coordinates'][1])
     # Create a buffer around the Point object with a radius of 20 meters
     polygon = point.buffer(0.0002)  # 0.0002 is roughly equivalent to 20 meters
-    url = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/templates/fatih.geojson'
+    url = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/fatih.geojson'
     faith_geojson = requests.get(url).json()
     faith_shape = shape(faith_geojson['features'][0]['geometry'])
     if polygon.within(faith_shape):
