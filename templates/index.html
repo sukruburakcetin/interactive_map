@@ -21,6 +21,7 @@
     </style>
 <body>
     <div id="map" ></div>
+<!--    <button id="compare-btn">Compare Markers</button>-->
     <script>
         var map = L.map('map').setView([41.008806, 28.980162], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -62,6 +63,9 @@
             }
         });
         map.addControl(drawControl);
+        let locationValuesList = [];
+        var compareButtonAdded = false; // flag to check if compare button is already added
+
         map.on('draw:created', function (e) {
             var type = e.layerType,
                 layer = e.layer;
@@ -69,28 +73,106 @@
                 // Do something with the marker here, e.g. send it to the server
                 var latlng = layer.getLatLng();
                 // layer.bindPopup('<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
-                var locationName = prompt("Please enter the location name:", "");
+                var locationValues = prompt("Please enter the location value:", "");
 
                 // Add the location name to the marker popup
-                layer.bindPopup("Location: " + locationName + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
-                console.log(layer.toGeoJSON());
-        $.ajax({
-            url: '/save-points',
-            type: 'POST',
-            data: JSON.stringify({points: layer.toGeoJSON()}),
-            contentType: 'application/json',
-            dataType: 'json',
-            success: function(response) {
-                console.log(response);
-                L.geoJSON(response).addTo(map);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
+                layer.bindPopup("Location: " + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
 
-        console.log(drawnItems.toGeoJSON()); // log the GeoJSON data
+                console.log(layer.toGeoJSON());
+                $.ajax({
+                    url: '/save-points',
+                    type: 'POST',
+                    data: JSON.stringify({points: layer.toGeoJSON()}),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        L.geoJSON(response).addTo(map);
+                    },
+                    error: function(error) {
+                        console.log(error);
+                    }
+                });
+
+                console.log(drawnItems.toGeoJSON()); // log the GeoJSON data
             }
+            // Check if the location value is NaN and set it to 0 if that's the case
+            locationValues = isNaN(parseInt(locationValues)) ? 0 : locationValues;
+            locationValuesList.push(parseInt(locationValues));
+            console.log(locationValuesList)
+
+
+            // Define a custom control for the compare button
+            var compareButton = L.Control.extend({
+              options: {
+                position: 'topright'
+              },
+
+              onAdd: function (map) {
+                // Check if the button has already been added to the map
+                if (map.compareButton) {
+                  return map.compareButton;
+                }
+
+                // Create the button
+                var button = L.DomUtil.create('button', 'compare-button');
+                button.innerHTML = 'Compare Markers';
+                L.DomEvent.on(button, 'click', this._onClick, this);
+
+                // Add the custom CSS style
+                button.style.backgroundColor = 'green';
+                button.style.color = 'white';
+                button.style.padding = '10px 20px';
+                button.style.fontSize = '16px';
+                button.style.border = 'none';
+                button.style.borderRadius = '30px';
+                button.style.cursor = 'pointer';
+                button.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.4)';
+                button.style.transition = 'all 0.3s ease-in-out';
+
+                // Add an animation on hover
+                button.addEventListener('mouseenter', function() {
+                  button.style.transform = 'scale(1.1)';
+                  button.style.backgroundColor = 'linear-gradient(45deg, #FF8C00, #FF0080)';
+                });
+
+                button.addEventListener('mouseleave', function() {
+                  button.style.transform = 'scale(1)';
+                  button.style.backgroundColor = 'linear-gradient(45deg, #FF0080, #FF8C00)';
+                });
+                // Save the button instance to the map object
+                map.compareButton = button;
+
+                return button;
+              },
+
+              _onClick: function () {
+                // Find the highest value in locationValuesList
+                var highestValue = Math.max.apply(Math, locationValuesList);
+
+                // Loop through each layer in the drawnItems feature group
+                drawnItems.eachLayer(function(layer) {
+                  // Check if the layer is a marker
+                  if (layer instanceof L.Marker) {
+                    // Get the location value from the marker's popup content
+                    var popupContent = layer.getPopup().getContent();
+                    var locationValue = parseInt(popupContent.split('Location: ')[1]);
+
+                    // If the location value matches the highest value, add a custom marker icon
+                    if (locationValue === highestValue) {
+                      layer.setIcon(new L.Icon({
+                        iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 32],
+                        popupAnchor: [0, -28]
+                      }));
+                    }
+                  }
+                });
+              }
+            });
+            map.addControl(new compareButton());
+
             drawnItems.addLayer(layer);
             console.log(drawnItems.toGeoJSON());
         });
