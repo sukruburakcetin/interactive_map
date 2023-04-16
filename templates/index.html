@@ -18,9 +18,26 @@
         height: 100vh;
         width: 100vw;
       }
+
+      #toggle-layer {
+          position: absolute;
+          top: 180px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          width: 32px;
+      }
+
+      #toggle-layer:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
     </style>
 <body>
     <div id="map" ></div>
+    <button id="toggle-layer">T</button>
     <script>
         var map = L.map('map').setView([41.008806, 28.980162], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -28,28 +45,13 @@
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // // fatih district layer
-        // $.getJSON('/static/fatih.geojson', function(data) {
-        //     console.log(data); // log the GeoJSON data
-        //     // create a new GeoJSON layer and add it to the map
-        //     var fatihLayer = L.geoJSON(data, {
-        //         style: function(feature) {
-        //             return {
-        //                 color: '#000',
-        //                 weight: 2,
-        //                 opacity: 1,
-        //                 fillOpacity: 0.2 // try changing this value
-        //             };
-        //         }
-        //     }).addTo(map);
-        //     console.log(fatihLayer); // log the fatih district borders layer
-        // });
+        // define the suitabilityLayer variable outside of the callback function
+        var suitabilityLayer;
 
         $.getJSON('/static/kres_uygunluk.geojson', function(data) {
           console.log(data); // log the GeoJSON data
-          // create a new GeoJSON layer and add it to the map
-          var suitabilityLayer = L.geoJSON(data, {
-
+          // create a new GeoJSON layer and assign it to the suitabilityLayer variable
+          suitabilityLayer = L.geoJSON(data, {
             style: function(feature) {
               var gridcode = feature.properties.GRIDCODE;
               var fillColor;
@@ -68,9 +70,24 @@
                 fillColor: fillColor
               };
             }
-          }).addTo(map);
-          console.log(suitabilityLayer); // log the fatih district borders layer
+          });
         });
+
+        // get the toggle layer button element
+        var toggleLayerBtn = document.getElementById('toggle-layer');
+
+        // add an event listener to the button
+        toggleLayerBtn.addEventListener('click', function() {
+          if (map.hasLayer(suitabilityLayer)) {
+            // if the layer is currently visible, remove it from the map
+            map.removeLayer(suitabilityLayer);
+          } else {
+            // if the layer is currently hidden, add it to the map
+            suitabilityLayer.addTo(map);
+          }
+        });
+
+
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
         var drawControl = new L.Control.Draw({
