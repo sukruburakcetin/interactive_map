@@ -1,0 +1,182 @@
+<!--v1-->
+
+<!--<!DOCTYPE html>-->
+<!--<html>-->
+<!--<head>-->
+<!--    <title>Draw Points on Folium Map</title>-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" crossorigin="anonymous" referrerpolicy="no-referrer" />-->
+<!--    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js" crossorigin="anonymous"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" crossorigin="anonymous"></script>-->
+<!--</head>-->
+<!--    <style>-->
+<!--      #map {-->
+<!--        position: absolute;-->
+<!--        top: 0;-->
+<!--        left: 0;-->
+<!--        right: 0;-->
+<!--        bottom: 0;-->
+<!--        height: 100vh;-->
+<!--        width: 100vw;-->
+<!--      }-->
+<!--    </style>-->
+<!--<body>-->
+<!--    <div id="map" ></div>-->
+<!--    <script>-->
+<!--        var map = L.map('map').setView([41.008806, 28.980162], 13);-->
+<!--        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {-->
+<!--            maxZoom: 19,-->
+<!--            attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'-->
+<!--        }).addTo(map);-->
+<!--        $.getJSON('/static/fatih.geojson', function(data) {-->
+<!--            console.log(data); // log the GeoJSON data-->
+<!--            // create a new GeoJSON layer and add it to the map-->
+<!--            var fatihLayer = L.geoJSON(data, {-->
+<!--                style: function(feature) {-->
+<!--                    return {-->
+<!--                        color: '#000',-->
+<!--                        weight: 2,-->
+<!--                        opacity: 1,-->
+<!--                        fillOpacity: 0.2 // try changing this value-->
+<!--                    };-->
+<!--                }-->
+<!--            }).addTo(map);-->
+<!--            console.log(fatihLayer); // log the fatih district borders layer-->
+<!--        });-->
+
+<!--        var drawnItems = new L.FeatureGroup();-->
+<!--        map.addLayer(drawnItems);-->
+<!--        var drawControl = new L.Control.Draw({-->
+<!--            edit: {-->
+<!--                featureGroup: drawnItems,-->
+<!--                edit: false-->
+<!--            },-->
+<!--            draw: {-->
+<!--                polygon: false,-->
+<!--                circle: false,-->
+<!--                marker: {-->
+<!--                    icon: new L.Icon.Default(),-->
+<!--                    repeatMode: true-->
+<!--                },-->
+<!--                circlemarker: false,-->
+<!--                rectangle: false,-->
+<!--                polyline: false-->
+<!--            }-->
+<!--        });-->
+<!--        map.addControl(drawControl);-->
+
+<!--        let locationValuesList = [];-->
+
+<!--        map.on('draw:created', function (e) {-->
+<!--            var type = e.layerType,-->
+<!--                layer = e.layer;-->
+<!--            if (type === 'marker') {-->
+<!--                // Do something with the marker here, e.g. send it to the server-->
+<!--                var latlng = layer.getLatLng();-->
+<!--                var locationValues = prompt("Please enter the location value:", "");-->
+
+<!--                // Add the location name to the marker popup-->
+<!--                layer.bindPopup("Location: " + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));-->
+
+<!--                console.log(layer.toGeoJSON());-->
+<!--                $.ajax({-->
+<!--                    url: '/save-points',-->
+<!--                    type: 'POST',-->
+<!--                    data: JSON.stringify({points: layer.toGeoJSON()}),-->
+<!--                    contentType: 'application/json',-->
+<!--                    dataType: 'json',-->
+<!--                    success: function(response) {-->
+<!--                        console.log(response);-->
+<!--                        L.geoJSON(response).addTo(map);-->
+<!--                    },-->
+<!--                    error: function(error) {-->
+<!--                        console.log(error);-->
+<!--                    }-->
+<!--                });-->
+
+<!--                console.log(drawnItems.toGeoJSON()); // log the GeoJSON data-->
+<!--            }-->
+<!--            // Check if the location value is NaN and set it to 0 if that's the case-->
+<!--            locationValues = isNaN(parseInt(locationValues)) ? 0 : locationValues;-->
+<!--            locationValuesList.push(parseInt(locationValues));-->
+<!--            console.log(locationValuesList)-->
+
+
+<!--            // Define a custom control for the compare button-->
+<!--            var compareButton = L.Control.extend({-->
+<!--              options: {-->
+<!--                position: 'topright'-->
+<!--              },-->
+
+<!--              onAdd: function (map) {-->
+<!--                // Check if the button has already been added to the map-->
+<!--                if (map.compareButton) {-->
+<!--                  return map.compareButton;-->
+<!--                }-->
+
+<!--                // Create the button-->
+<!--                var button = L.DomUtil.create('button', 'compare-button');-->
+<!--                button.innerHTML = 'Compare Markers';-->
+<!--                L.DomEvent.on(button, 'click', this._onClick, this);-->
+
+<!--                // Add the custom CSS style-->
+<!--                button.style.backgroundColor = 'green';-->
+<!--                button.style.color = 'white';-->
+<!--                button.style.padding = '10px 20px';-->
+<!--                button.style.fontSize = '16px';-->
+<!--                button.style.border = 'none';-->
+<!--                button.style.borderRadius = '30px';-->
+<!--                button.style.cursor = 'pointer';-->
+<!--                button.style.boxShadow = '2px 2px 4px rgba(0, 0, 0, 0.4)';-->
+<!--                button.style.transition = 'all 0.3s ease-in-out';-->
+
+<!--                // Add an animation on hover-->
+<!--                button.addEventListener('mouseenter', function() {-->
+<!--                  button.style.transform = 'scale(1.1)';-->
+<!--                  button.style.backgroundColor = 'linear-gradient(45deg, #FF8C00, #FF0080)';-->
+<!--                });-->
+
+<!--                button.addEventListener('mouseleave', function() {-->
+<!--                  button.style.transform = 'scale(1)';-->
+<!--                  button.style.backgroundColor = 'linear-gradient(45deg, #FF0080, #FF8C00)';-->
+<!--                });-->
+<!--                // Save the button instance to the map object-->
+<!--                map.compareButton = button;-->
+
+<!--                return button;-->
+<!--              },-->
+
+<!--              _onClick: function () {-->
+<!--                // Find the highest value in locationValuesList-->
+<!--                var highestValue = Math.max.apply(Math, locationValuesList);-->
+
+<!--                // Loop through each layer in the drawnItems feature group-->
+<!--                drawnItems.eachLayer(function(layer) {-->
+<!--                  // Check if the layer is a marker-->
+<!--                  if (layer instanceof L.Marker) {-->
+<!--                    // Get the location value from the marker's popup content-->
+<!--                    var popupContent = layer.getPopup().getContent();-->
+<!--                    var locationValue = parseInt(popupContent.split('Location: ')[1]);-->
+
+<!--                    // If the location value matches the highest value, add a custom marker icon-->
+<!--                    if (locationValue === highestValue) {-->
+<!--                      layer.setIcon(new L.Icon({-->
+<!--                        iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',-->
+<!--                        iconSize: [32, 32],-->
+<!--                        iconAnchor: [16, 32],-->
+<!--                        popupAnchor: [0, -28]-->
+<!--                      }));-->
+<!--                    }-->
+<!--                  }-->
+<!--                });-->
+<!--              }-->
+<!--            });-->
+<!--            map.addControl(new compareButton());-->
+
+<!--            drawnItems.addLayer(layer);-->
+<!--            console.log(drawnItems.toGeoJSON());-->
+<!--        });-->
+<!--    </script>-->
+<!--</body>-->
+<!--</html>-->
