@@ -27,22 +27,50 @@
             maxZoom: 19,
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
         }).addTo(map);
-        $.getJSON('/static/fatih.geojson', function(data) {
-            console.log(data); // log the GeoJSON data
-            // create a new GeoJSON layer and add it to the map
-            var fatihLayer = L.geoJSON(data, {
-                style: function(feature) {
-                    return {
-                        color: '#000',
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.2 // try changing this value
-                    };
-                }
-            }).addTo(map);
-            console.log(fatihLayer); // log the fatih district borders layer
-        });
 
+        // // fatih district layer
+        // $.getJSON('/static/fatih.geojson', function(data) {
+        //     console.log(data); // log the GeoJSON data
+        //     // create a new GeoJSON layer and add it to the map
+        //     var fatihLayer = L.geoJSON(data, {
+        //         style: function(feature) {
+        //             return {
+        //                 color: '#000',
+        //                 weight: 2,
+        //                 opacity: 1,
+        //                 fillOpacity: 0.2 // try changing this value
+        //             };
+        //         }
+        //     }).addTo(map);
+        //     console.log(fatihLayer); // log the fatih district borders layer
+        // });
+
+        $.getJSON('/static/kres_uygunluk.geojson', function(data) {
+          console.log(data); // log the GeoJSON data
+          // create a new GeoJSON layer and add it to the map
+          var suitabilityLayer = L.geoJSON(data, {
+
+            style: function(feature) {
+              var gridcode = feature.properties.GRIDCODE;
+              var fillColor;
+              if (gridcode === 1) {
+                fillColor = 'black';
+              } else if (gridcode === 2) {
+                fillColor = 'yellow';
+              } else {
+                fillColor = 'red';
+              }
+              return {
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.2,
+                fillColor: fillColor
+              };
+            }
+          }).addTo(map);
+          console.log(suitabilityLayer); // log the fatih district borders layer
+        });
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
         var drawControl = new L.Control.Draw({
@@ -69,13 +97,14 @@
         map.on('draw:created', function (e) {
             var type = e.layerType,
                 layer = e.layer;
+            var gridScore = 0;
             if (type === 'marker') {
                 // Do something with the marker here, e.g. send it to the server
                 var latlng = layer.getLatLng();
                 var locationValues = prompt("Please enter the location value:", "");
 
                 // Add the location name to the marker popup
-                layer.bindPopup("Location: " + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
+                // layer.bindPopup("Location: " + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
 
                 console.log(layer.toGeoJSON());
                 $.ajax({
@@ -85,21 +114,24 @@
                     contentType: 'application/json',
                     dataType: 'json',
                     success: function(response) {
-                        console.log(response);
+                        console.log("success_return_log", response);
                         L.geoJSON(response).addTo(map);
+
+                        // Add the properties to the marker popup
+                        layer.bindPopup('Location: ' + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) +
+                            '<br>Longitude: ' + latlng.lng.toFixed(6) + '<br>ID: ' + response['id'] + '<br>GRIDCODE: '
+                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'])
+                        locationValues = isNaN(parseInt(response['gridcode'])) ? 0 : response['gridcode'];
+                        locationValuesList.push(parseInt(response['gridcode']));
+
                     },
                     error: function(error) {
-                        console.log(error);
+                        console.log("fail_return_log", error);
                     }
                 });
 
-                console.log(drawnItems.toGeoJSON()); // log the GeoJSON data
+                console.log("drawnItems_log", drawnItems.toGeoJSON()); // log the GeoJSON data
             }
-            // Check if the location value is NaN and set it to 0 if that's the case
-            locationValues = isNaN(parseInt(locationValues)) ? 0 : locationValues;
-            locationValuesList.push(parseInt(locationValues));
-            console.log(locationValuesList)
-
 
             // Define a custom control for the compare button
             var compareButton = L.Control.extend({
@@ -147,6 +179,7 @@
 
               _onClick: function () {
                 // Find the highest value in locationValuesList
+
                 var highestValue = Math.max.apply(Math, locationValuesList);
 
                 // Loop through each layer in the drawnItems feature group
@@ -155,7 +188,7 @@
                   if (layer instanceof L.Marker) {
                     // Get the location value from the marker's popup content
                     var popupContent = layer.getPopup().getContent();
-                    var locationValue = parseInt(popupContent.split('Location: ')[1]);
+                    var locationValue = parseInt(popupContent.split('GRIDCODE: ')[1]);
 
                     // If the location value matches the highest value, add a custom marker icon
                     if (locationValue === highestValue) {
