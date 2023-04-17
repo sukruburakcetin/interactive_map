@@ -34,11 +34,71 @@
           color: #fff;
       }
 
+      #show-table {
+          position: absolute;
+          top: 210px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          padding: 2px;
+          width: 32px;
+      }
+
+      #show-table:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+      #marker-table {
+          position: absolute;
+          top: 300px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          width: 32px;
+          display: none; /* hide the table by default */
+          border: 2px black solid;
+          background-color: white;
+      }
+
+      #marker-table.show {
+        display: table; /* show the table when the "show" class is added */
+      }
+
+      #marker-table th,
+      #marker-table td {
+          border: 1px solid black;
+          padding: 5px;
+      }
+
     </style>
 <body>
     <div id="map" ></div>
     <button id="toggle-layer">T</button>
+    <button id="show-table">Show Table</button>
+    <table id="marker-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Location</th>
+              <th>Latitude</th>
+              <th>Longitude</th>
+              <th>GRIDCODE</th>
+              <th>SUITABILITY</th>
+            </tr>
+          </thead>
+          <tbody>
+          </tbody>
+    </table>
     <script>
+        var showTableBtn = document.getElementById('show-table');
+        var markerTable = document.getElementById('marker-table');
+
+        showTableBtn.addEventListener('click', function() {
+          markerTable.classList.toggle('show');
+        });
         var map = L.map('map').setView([41.008806, 28.980162], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -118,7 +178,7 @@
             if (type === 'marker') {
                 // Do something with the marker here, e.g. send it to the server
                 var latlng = layer.getLatLng();
-                var locationValues = prompt("Please enter the location value:", "");
+                var locationValue = prompt("Please enter the location value:", "");
 
                 // Add the location name to the marker popup
                 // layer.bindPopup("Location: " + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
@@ -134,12 +194,22 @@
                         console.log("success_return_log", response);
                         L.geoJSON(response).addTo(map);
 
+                          var newRow = '<tr>' +
+                            '<td>' + response['id'] + '</td>' +
+                            '<td>' + locationValue + '</td>' +
+                            '<td>' + latlng.lat.toFixed(6) + '</td>' +
+                            '<td>' + latlng.lng.toFixed(6) + '</td>' +
+                            '<td>' + response.gridcode + '</td>' +
+                            '<td>' + response.suitability + '</td>' +
+                            '</tr>';
+                      $('#marker-table tbody').append(newRow);
+
                         // Add the properties to the marker popup
-                        layer.bindPopup('Location: ' + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) +
+                        layer.bindPopup('Location: ' + locationValue + '<br>Latitude: ' + latlng.lat.toFixed(6) +
                             '<br>Longitude: ' + latlng.lng.toFixed(6) + '<br>ID: ' + response['id'] + '<br>GRIDCODE: '
                             + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'])
-                        locationValues = isNaN(parseInt(response['gridcode'])) ? 0 : response['gridcode'];
-                        locationValuesList.push(parseInt(response['gridcode']));
+                        locationValue = isNaN(parseInt(response['gridcode'])) ? 0 : response['gridcode'];
+                        locationValuesList.push(parseInt(locationValue));
 
                     },
                     error: function(error) {
@@ -220,6 +290,38 @@
                 });
               }
             });
+
+            // $('#show-table').on('click', function() {
+            //       var tableBody = $('#marker-table tbody');
+            //       tableBody.empty(); // Clear any existing table rows
+            //
+            //       // Iterate over all the markers on the map
+            //       map.eachLayer(function(layer) {
+            //         if (layer instanceof L.Marker) { // Only consider markers
+            //           var popupContent = layer.getPopup().getContent(); // Get the popup content
+            //
+            //           // Parse the popup content into an object with the properties you want to display
+            //           var popupData = {
+            //             location: popupContent.split('<br>')[0].replace('Location: ', ''),
+            //             lat: popupContent.split('<br>')[1].replace('Latitude: ', ''),
+            //             lng: popupContent.split('<br>')[2].replace('Longitude: ', ''),
+            //             id: popupContent.split('<br>')[3].replace('ID: ', ''),
+            //             gridcode: popupContent.split('<br>')[4].replace('GRIDCODE: ', ''),
+            //             suitability: popupContent.split('<br>')[5].replace('SUITABILITY: ', '')
+            //           };
+            //
+            //           // Create a new table row with the popup data and add it to the table
+            //           var newRow = $('<tr>');
+            //           newRow.append($('<td>').text(popupData.location));
+            //           newRow.append($('<td>').text(popupData.lat));
+            //           newRow.append($('<td>').text(popupData.lng));
+            //           newRow.append($('<td>').text(popupData.id));
+            //           newRow.append($('<td>').text(popupData.gridcode));
+            //           newRow.append($('<td>').text(popupData.suitability));
+            //           tableBody.append(newRow);
+            //         }
+            //       });
+            //     });
             map.addControl(new compareButton());
 
             drawnItems.addLayer(layer);
