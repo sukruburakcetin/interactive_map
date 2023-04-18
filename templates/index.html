@@ -28,13 +28,13 @@
           z-index: 999;
           width: 32px;
       }
-    .leaflet-right .leaflet-control {
+     .leaflet-right .leaflet-control {
         margin-right: 10px;
         background-color: white;
         border-radius: 5px;
         padding: 5px;
         border: 2px black solid;
-    }
+     }
 
       #toggle-layer:hover {
           background-color: #333;
@@ -56,7 +56,53 @@
           background-color: #333;
           color: #fff;
       }
+      .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 20px;
+        width: 80%;
+        max-width: 600px;
+        border: none;
+        border-image: repeating-linear-gradient(45deg, transparent, transparent 5px, #555 5px, #555 10px) 1 / 10px;
+        border-radius: 5px;
+        z-index: 9999;
+        opacity: 0;
+        animation-name: fadeIn;
+        animation-duration: 0.5s;
+        animation-fill-mode: forwards;
+      }
 
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -60%);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%);
+        }
+      }
+
+      .popup .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 20px;
+        color: #333;
+        background-color: #fff;
+        border: none;
+        border-radius: 50%;
+        padding: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .popup .close-btn:hover {
+        background-color: #eee;
+      }
       #marker-table {
           position: absolute;
           top: 300px;
@@ -85,6 +131,18 @@
     <div id="map" ></div>
     <button id="toggle-layer">T</button>
     <button id="show-table">Show Table</button>
+    <div class="popup">
+      <h2>Welcome to our site!</h2>
+      <p>Here are some tips to help you get started:</p>
+      <ul>
+        <li>Use the search bar to find what you're looking for</li>
+        <li>Click on the menu icon to see all of our categories</li>
+        <li>Use the filters to refine your search results</li>
+        <li>Click on the heart icon to save items to your wishlist</li>
+      </ul>
+      <p>Got it! Let's start shopping!</p>
+      <button class="close-btn">Close</button>
+    </div>
     <table id="marker-table">
           <thead>
             <tr>
@@ -100,6 +158,20 @@
           </tbody>
     </table>
     <script>
+                // Get the popup and the close button
+        const popup = document.querySelector('.popup');
+        const closeBtn = popup.querySelector('.close-btn');
+
+        // Add an event listener to the close button
+        closeBtn.addEventListener('click', () => {
+          // Hide the popup
+          popup.style.display = 'none';
+        });
+
+        // Show the popup when the page is loaded
+        window.addEventListener('load', () => {
+          popup.style.display = 'block';
+        });
         var showTableBtn = document.getElementById('show-table');
         var markerTable = document.getElementById('marker-table');
 
@@ -116,13 +188,11 @@
           attribution: 'Tiles © Esri'
         }).addTo(map);
 
+
         var layerControl = L.control.layers({
             'OSM': layer1,
             'ESRI': esriLayer
         }).addTo(map);
-
-
-
 
         // define the suitabilityLayer variable outside of the callback function
         var suitabilityLayer;
@@ -153,37 +223,35 @@
         });
 
 
-// create a custom control for the legend
-var legend = L.control({position: 'bottomright'});
+        // create a custom control for the legend
+        var legend = L.control({position: 'bottomright'});
 
+        // get the toggle layer button element
+        var toggleLayerBtn = document.getElementById('toggle-layer');
 
+        // add an event listener to the button
+        toggleLayerBtn.addEventListener('click', function() {
+          if (map.hasLayer(suitabilityLayer)) {
+            // if the layer is currently visible, remove it from the map
+            map.removeLayer(suitabilityLayer);
+            map.removeControl(legend); // remove the legend control from the map
+          } else {
+            // if the layer is currently hidden, add it to the map
+            suitabilityLayer.addTo(map);
+            // define the contents of the legend
+            legend.onAdd = function (map) {
+              var div = L.DomUtil.create('div', 'info legend');
+              div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+              div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Az Uygun</span><br>';
+              div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Uygun</span><br>';
+              div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Çok Uygun</span><br>';
+              return div;
+            };
 
-// get the toggle layer button element
-var toggleLayerBtn = document.getElementById('toggle-layer');
-
-// add an event listener to the button
-toggleLayerBtn.addEventListener('click', function() {
-  if (map.hasLayer(suitabilityLayer)) {
-    // if the layer is currently visible, remove it from the map
-    map.removeLayer(suitabilityLayer);
-    map.removeControl(legend); // remove the legend control from the map
-  } else {
-    // if the layer is currently hidden, add it to the map
-    suitabilityLayer.addTo(map);
-    // define the contents of the legend
-    legend.onAdd = function (map) {
-      var div = L.DomUtil.create('div', 'info legend');
-      div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
-      div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Az Uygun</span><br>';
-      div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Uygun</span><br>';
-      div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Çok Uygun</span><br>';
-      return div;
-    };
-
-    // add the legend control to the map
-    legend.addTo(map); // add the legend control to the map
-  }
-});
+            // add the legend control to the map
+            legend.addTo(map); // add the legend control to the map
+          }
+        });
 
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
