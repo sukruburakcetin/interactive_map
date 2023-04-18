@@ -42,26 +42,5 @@ def save_points():
     return jsonify(feature)
 
 
-    # url = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/fatih.geojson'
-    # faith_geojson = requests.get(url).json()
-    # faith_shape = shape(faith_geojson['features'][0]['geometry'])
-    # if polygon.within(faith_shape):
-    #     print('Polygon is within the Faith GeoJSON boundaries')
-    #     # Convert the Shapely Polygon object to a GeoJSON Feature object
-    #     feature = {
-    #         'type': 'Feature',
-    #         'geometry': {
-    #             'type': 'Polygon',
-    #             'coordinates': [list(polygon.exterior.coords)]
-    #         }
-    #     }
-    #     # Return the GeoJSON Feature object as a JSON response
-    #     return jsonify(feature)
-    # else:
-    #     print('Polygon is not within the Faith GeoJSON boundaries')
-    #     # Return an error response
-    #     return jsonify({'error': 'Polygon is not within the Faith GeoJSON boundaries'})
-
-
 if __name__ == "__main__":
     app.run(debug=True)

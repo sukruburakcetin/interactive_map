@@ -28,6 +28,13 @@
           z-index: 999;
           width: 32px;
       }
+    .leaflet-right .leaflet-control {
+        margin-right: 10px;
+        background-color: white;
+        border-radius: 5px;
+        padding: 5px;
+        border: 2px black solid;
+    }
 
       #toggle-layer:hover {
           background-color: #333;
@@ -100,10 +107,22 @@
           markerTable.classList.toggle('show');
         });
         var map = L.map('map').setView([41.008806, 28.980162], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        var layer1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
         }).addTo(map);
+
+        var esriLayer = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+          attribution: 'Tiles © Esri'
+        }).addTo(map);
+
+        var layerControl = L.control.layers({
+            'OSM': layer1,
+            'ESRI': esriLayer
+        }).addTo(map);
+
+
+
 
         // define the suitabilityLayer variable outside of the callback function
         var suitabilityLayer;
@@ -133,20 +152,38 @@
           });
         });
 
-        // get the toggle layer button element
-        var toggleLayerBtn = document.getElementById('toggle-layer');
 
-        // add an event listener to the button
-        toggleLayerBtn.addEventListener('click', function() {
-          if (map.hasLayer(suitabilityLayer)) {
-            // if the layer is currently visible, remove it from the map
-            map.removeLayer(suitabilityLayer);
-          } else {
-            // if the layer is currently hidden, add it to the map
-            suitabilityLayer.addTo(map);
-          }
-        });
+// create a custom control for the legend
+var legend = L.control({position: 'bottomright'});
 
+
+
+// get the toggle layer button element
+var toggleLayerBtn = document.getElementById('toggle-layer');
+
+// add an event listener to the button
+toggleLayerBtn.addEventListener('click', function() {
+  if (map.hasLayer(suitabilityLayer)) {
+    // if the layer is currently visible, remove it from the map
+    map.removeLayer(suitabilityLayer);
+    map.removeControl(legend); // remove the legend control from the map
+  } else {
+    // if the layer is currently hidden, add it to the map
+    suitabilityLayer.addTo(map);
+    // define the contents of the legend
+    legend.onAdd = function (map) {
+      var div = L.DomUtil.create('div', 'info legend');
+      div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+      div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Az Uygun</span><br>';
+      div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Uygun</span><br>';
+      div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Çok Uygun</span><br>';
+      return div;
+    };
+
+    // add the legend control to the map
+    legend.addTo(map); // add the legend control to the map
+  }
+});
 
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
@@ -179,9 +216,6 @@
                 // Do something with the marker here, e.g. send it to the server
                 var latlng = layer.getLatLng();
                 var locationValue = prompt("Please enter the location value:", "");
-
-                // Add the location name to the marker popup
-                // layer.bindPopup("Location: " + locationValues + '<br>Latitude: ' + latlng.lat.toFixed(6) + '<br>Longitude: ' + latlng.lng.toFixed(6));
 
                 console.log(layer.toGeoJSON());
                 $.ajax({
@@ -291,37 +325,6 @@
               }
             });
 
-            // $('#show-table').on('click', function() {
-            //       var tableBody = $('#marker-table tbody');
-            //       tableBody.empty(); // Clear any existing table rows
-            //
-            //       // Iterate over all the markers on the map
-            //       map.eachLayer(function(layer) {
-            //         if (layer instanceof L.Marker) { // Only consider markers
-            //           var popupContent = layer.getPopup().getContent(); // Get the popup content
-            //
-            //           // Parse the popup content into an object with the properties you want to display
-            //           var popupData = {
-            //             location: popupContent.split('<br>')[0].replace('Location: ', ''),
-            //             lat: popupContent.split('<br>')[1].replace('Latitude: ', ''),
-            //             lng: popupContent.split('<br>')[2].replace('Longitude: ', ''),
-            //             id: popupContent.split('<br>')[3].replace('ID: ', ''),
-            //             gridcode: popupContent.split('<br>')[4].replace('GRIDCODE: ', ''),
-            //             suitability: popupContent.split('<br>')[5].replace('SUITABILITY: ', '')
-            //           };
-            //
-            //           // Create a new table row with the popup data and add it to the table
-            //           var newRow = $('<tr>');
-            //           newRow.append($('<td>').text(popupData.location));
-            //           newRow.append($('<td>').text(popupData.lat));
-            //           newRow.append($('<td>').text(popupData.lng));
-            //           newRow.append($('<td>').text(popupData.id));
-            //           newRow.append($('<td>').text(popupData.gridcode));
-            //           newRow.append($('<td>').text(popupData.suitability));
-            //           tableBody.append(newRow);
-            //         }
-            //       });
-            //     });
             map.addControl(new compareButton());
 
             drawnItems.addLayer(layer);
