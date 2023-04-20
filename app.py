@@ -22,9 +22,12 @@ def save_points():
     polygon = point.buffer(0.0002)  # 0.0002 is roughly equivalent to 20 meters
     url = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/kres_uygunluk.geojson'
     kres_uygunluk_geojson = requests.get(url).json()
+    # Checks there is a polygon that can be intersected
+    thereIsAPolygon = 0
     for i in range(0, len(kres_uygunluk_geojson['features'])):
         current_kres_uygunluk_shape = shape(kres_uygunluk_geojson['features'][i]['geometry'])
         if polygon.within(current_kres_uygunluk_shape):
+            thereIsAPolygon = 1
             print(kres_uygunluk_geojson['features'][i]['properties']['ID'])
             print(kres_uygunluk_geojson['features'][i]['properties']['GRIDCODE'])
             # Convert the Shapely Polygon object to a GeoJSON Feature object
@@ -38,7 +41,18 @@ def save_points():
                 'gridcode': kres_uygunluk_geojson['features'][i]['properties']['GRIDCODE'],
                 'suitability': kres_uygunluk_geojson['features'][i]['properties']['UYGUNLUK_D']
             }
-            # Return the GeoJSON Feature object as a JSON response
+    if thereIsAPolygon == 0:
+        feature = {
+            'type': 'Feature',
+            'geometry': {
+                'type': 'Polygon',
+                'coordinates': [list(polygon.exterior.coords)]
+            },
+            'id': "No Suitability Polygon",
+            'gridcode': 0,
+            'suitability': 0
+        }
+    # Return the GeoJSON Feature object as a JSON response
     return jsonify(feature)
 
 
