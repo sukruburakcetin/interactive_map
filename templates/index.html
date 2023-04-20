@@ -37,6 +37,14 @@
          font-size: x-small;
      }
 
+    .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove.leaflet-disabled {
+
+        display: none;
+    }
+
+    .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove {
+    display: none;
+}
 
       #toggle-layer:hover {
           background-color: #333;
@@ -107,7 +115,7 @@
       }
       #marker-table {
           position: absolute;
-          top: 300px;
+          top: 330px;
           left: 10px;
           margin-left:1px;
           font-size: 10px;
@@ -128,11 +136,46 @@
           padding: 5px;
       }
 
+      #delete-features {
+          position: absolute;
+          top: 250px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 9px;
+          z-index: 999;
+          padding: 2px;
+          width: 33px;
+      }
+
+      #delete-features:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+      #delete-last-feature {
+          position: absolute;
+          top: 280px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 8px;
+          z-index: 999;
+          padding: 1px;
+          width: 33px;
+      }
+
+      #delete-last-feature:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
     </style>
 <body>
     <div id="map" ></div>
     <button id="toggle-layer">T</button>
     <button id="show-table">Show Table</button>
+    <button id="delete-features">Delete All</button>
+    <button id="delete-last-feature">Delete Last Feature</button>
+
     <div class="popup">
       <h2>Welcome to our site!</h2>
       <p>Here are some tips to help you get started:</p>
@@ -313,11 +356,10 @@
         map.addControl(drawControl);
 
         let locationValuesList = [];
-
+        let addedLayers = []
         map.on('draw:created', function (e) {
             var type = e.layerType,
                 layer = e.layer;
-            var gridScore = 0;
             if (type === 'marker') {
                 // Do something with the marker here, e.g. send it to the server
                 var latlng = layer.getLatLng();
@@ -332,8 +374,8 @@
                     dataType: 'json',
                     success: function(response) {
                         console.log("success_return_log", response);
-                        L.geoJSON(response).addTo(map);
-
+                        addedLayer = L.geoJSON(response).addTo(map);
+                        addedLayers.push(addedLayer);
                           var newRow = '<tr>' +
                             '<td>' + response['id'] + '</td>' +
                             '<td>' + locationValue + '</td>' +
@@ -356,8 +398,7 @@
                         console.log("fail_return_log", error);
                     }
                 });
-
-                console.log("drawnItems_log", drawnItems.toGeoJSON()); // log the GeoJSON data
+                // console.log("drawnItems_log", drawnItems.toGeoJSON()); // log the GeoJSON data
             }
 
             // Define a custom control for the compare button
@@ -419,12 +460,17 @@
 
                     // If the location value matches the highest value, add a custom marker icon
                     if (locationValue === highestValue) {
-                      layer.setIcon(new L.Icon({
+                      var marker = layer.setIcon(new L.Icon({
                         iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 32],
-                        popupAnchor: [0, -28]
+                        iconSize: [64, 64],
+                        iconAnchor: [32, 64],
+                        popupAnchor: [0, -56]
                       }));
+                        marker.bindTooltip('Bu bölge diğerlerine göre daha uygun: ' + locationValue);
+                        marker.addTo(map);
+                        setTimeout(function() {
+                          marker.openTooltip();
+                        }, 100);
                     }
                   }
                 });
@@ -434,8 +480,44 @@
             map.addControl(new compareButton());
 
             drawnItems.addLayer(layer);
-            console.log(drawnItems.toGeoJSON());
+            // console.log(drawnItems.toGeoJSON());
         });
+
+        var deleteLastFeatureButton = document.getElementById('delete-last-feature');
+
+        // Add a click event listener to the button
+        deleteLastFeatureButton.addEventListener('click', function() {
+            // Remove the last marker from the map and from drawnItems
+            var lastMarker = drawnItems.getLayers().pop();
+            map.removeLayer(lastMarker);
+
+            var lastLayer = addedLayers.slice(-1)[0]; // Remove the last layer and get a reference to it
+            if (lastLayer) { // Check if the last layer exists
+                map.removeLayer(lastLayer); // Remove the last layer from the map
+            }
+            $('#marker-table tbody tr:last').remove();
+
+        });
+
+        // Get the "Delete All Layers" button element
+        var deleteButton = document.getElementById('delete-features');
+
+        // Add a click event listener to the button
+        deleteButton.addEventListener('click', function() {
+            // Clear all layers from the drawnItems feature group
+            drawnItems.clearLayers();
+            // Loop through the addedLayers array and remove each layer from the map
+            addedLayers.forEach(function(layer) {
+                map.removeLayer(layer);
+            });
+            // Clear the addedLayers array
+            addedLayers = [];
+            // Delete all rows in #marker-table tbody
+            $('#marker-table tbody tr').remove();
+        });
+
+
+
     </script>
 </body>
 </html>
