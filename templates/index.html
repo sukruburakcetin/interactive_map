@@ -167,45 +167,65 @@
           background-color: #333;
           color: #fff;
       }
+      #save-map {
+          position: absolute;
+          top: 320px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 8px;
+          z-index: 999;
+          padding: 1px;
+          width: 33px;
+      }
+
+      #save-map:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+
 
     </style>
 <body>
-    <div id="map" ></div>
-    <button id="toggle-layer">T</button>
-    <button id="show-table">Show Table</button>
-    <button id="delete-features">Delete All</button>
-    <button id="delete-last-feature">Delete Last Feature</button>
+        <div id="map" ></div>
+        <button id="toggle-layer">T</button>
+        <button id="show-table">Show Table</button>
+        <button id="delete-features">Delete All</button>
+        <button id="delete-last-feature">Delete Last Feature</button>
+        <button id="save-map">Save Map</button>
 
-    <div class="popup">
-      <h2>Welcome to our site!</h2>
-      <p>Here are some tips to help you get started:</p>
-      <ul>
-        <li>Use the search bar to find what you're looking for</li>
-        <li>Click on the menu icon to see all of our categories</li>
-        <li>Use the filters to refine your search results</li>
-        <li>Click on the heart icon to save items to your wishlist</li>
-      </ul>
-      <p>Got it! Let's start shopping!</p>
-      <button class="close-btn">Close</button>
-    </div>
-    <table id="marker-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Location</th>
-              <th>Latitude</th>
-              <th>Longitude</th>
-              <th>GRIDCODE</th>
-              <th>SUITABILITY</th>
-            </tr>
-          </thead>
-          <tbody>
-          </tbody>
-    </table>
+
+        <div class="popup">
+          <h2>Welcome to our site!</h2>
+          <p>Here are some tips to help you get started:</p>
+          <ul>
+            <li>Use the search bar to find what you're looking for</li>
+            <li>Click on the menu icon to see all of our categories</li>
+            <li>Use the filters to refine your search results</li>
+            <li>Click on the heart icon to save items to your wishlist</li>
+          </ul>
+          <p>Got it! Let's start shopping!</p>
+          <button class="close-btn">Close</button>
+        </div>
+        <table id="marker-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Location</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>GRIDCODE</th>
+                  <th>SUITABILITY</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+        </table>
     <script>
                 // Get the popup and the close button
         const popup = document.querySelector('.popup');
         const closeBtn = popup.querySelector('.close-btn');
+                        // create a button to trigger the saveMap function
 
         // Add an event listener to the close button
         closeBtn.addEventListener('click', () => {
@@ -516,8 +536,24 @@
             $('#marker-table tbody tr').remove();
         });
 
-
-
+        function saveData() {
+            var csv = "ID, LOCATION, LATITUDE, LONGITUDE, GRIDCODE, SUITABILITY\n";
+            $('#marker-table tbody tr').each(function(index, row) {
+                // Do something with the row, for example:
+                csv += $(row).find('td:first').text() + "," + $(row).find('td:eq(1)').text() + ","
+                    + $(row).find('td:eq(2)').text() + "," + $(row).find('td:eq(3)').text()
+                    + "," + $(row).find('td:eq(4)').text() + "," + $(row).find('td:eq(5)').text();
+                csv += "\n"
+            });
+            // Prompt the user to download the CSV file
+            var link = document.createElement('a');
+            link.download = 'markers.csv';
+            link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        document.getElementById("save-map").addEventListener("click", saveData);
     </script>
 </body>
 </html>
