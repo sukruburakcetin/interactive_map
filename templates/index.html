@@ -8,6 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
     <style>
       #map {
@@ -20,52 +21,22 @@
         width: 100vw;
       }
 
-      #toggle-layer {
-          position: absolute;
-          top: 180px;
-          left: 10px;
-          margin-left:1px;
-          font-size: 10px;
-          z-index: 999;
-          width: 32px;
-      }
-     .leaflet-right .leaflet-control {
+      .leaflet-right .leaflet-control {
         margin-right: 10px;
         background-color: white;
         border-radius: 5px;
         border: 2px black solid;
          font-size: x-small;
-     }
+      }
 
-    .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove.leaflet-disabled {
-
+      .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove.leaflet-disabled {
         display: none;
-    }
-
-    .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove {
-    display: none;
-}
-
-      #toggle-layer:hover {
-          background-color: #333;
-          color: #fff;
       }
 
-      #show-table {
-          position: absolute;
-          top: 210px;
-          left: 10px;
-          margin-left:1px;
-          font-size: 10px;
-          z-index: 999;
-          padding: 2px;
-          width: 32px;
+      .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-edit-remove {
+        display: none;
       }
 
-      #show-table:hover {
-          background-color: #333;
-          color: #fff;
-      }
       .popup {
         position: fixed;
         top: 50%;
@@ -113,6 +84,7 @@
       .popup .close-btn:hover {
         background-color: #eee;
       }
+
       #marker-table {
           position: absolute;
           top: 330px;
@@ -135,7 +107,40 @@
           border: 1px solid black;
           padding: 5px;
       }
+      /*toggle suitability layer*/
+      #toggle-layer {
+          position: absolute;
+          top: 180px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          width: 32px;
+      }
 
+      #toggle-layer:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+      /*show table*/
+      #show-table {
+          position: absolute;
+          top: 210px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          padding: 2px;
+          width: 32px;
+      }
+
+      #show-table:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+      /*delete-all*/
       #delete-features {
           position: absolute;
           top: 250px;
@@ -147,14 +152,16 @@
           width: 33px;
       }
 
+      /*delete-all-hover*/
       #delete-features:hover {
           background-color: #333;
           color: #fff;
       }
 
+      /*delete last feature*/
       #delete-last-feature {
           position: absolute;
-          top: 280px;
+          top: 285px;
           left: 10px;
           margin-left:1px;
           font-size: 8px;
@@ -163,28 +170,51 @@
           width: 33px;
       }
 
+      /*delete last feature hover*/
       #delete-last-feature:hover {
           background-color: #333;
           color: #fff;
       }
-      #save-map {
+
+      /*save features*/
+      #save-features {
           position: absolute;
-          top: 320px;
-          left: 10px;
+          top: 325px;
+          left: 8px;
           margin-left:1px;
           font-size: 8px;
           z-index: 999;
           padding: 1px;
-          width: 33px;
+          width: 38px;
       }
 
-      #save-map:hover {
+      /*save features hover*/
+      #save-features:hover {
           background-color: #333;
           color: #fff;
       }
 
+      .items{
+          display: inline-block;
+          font-size:14px;
+          border: 1px solid black;
+          padding: 2px 5px;
+          margin-right: 5px;
+      }
 
+      .popup-tile{
+        font-size:18px;
+      }
 
+      .popup-description{
+        font-size:16px;
+          text-align: justify;
+
+      }
+      .created-by{
+          font-size:14px;
+          text-align:center;
+      }
     </style>
 <body>
         <div id="map" ></div>
@@ -192,19 +222,28 @@
         <button id="show-table">Show Table</button>
         <button id="delete-features">Delete All</button>
         <button id="delete-last-feature">Delete Last Feature</button>
-        <button id="save-map">Save Map</button>
-
+        <button id="save-features">Save All Features</button>
 
         <div class="popup">
-          <h2>Welcome to our site!</h2>
-          <p>Here are some tips to help you get started:</p>
-          <ul>
-            <li>Use the search bar to find what you're looking for</li>
-            <li>Click on the menu icon to see all of our categories</li>
-            <li>Use the filters to refine your search results</li>
-            <li>Click on the heart icon to save items to your wishlist</li>
-          </ul>
-          <p>Got it! Let's start shopping!</p>
+          <h2 class="popup-tile">Uygunluk Analizi Simülasyon Motoru</h2>
+          <p class="popup-description">Uygunluk analizi, kategorik verilerin yorumlanmasını kolaylaştıran bir yöntemdir.
+              Analiz sonucunda elde edilen çapraz tablolarda, satır ve sütun değişkenleri arasındaki benzerlikler,
+              farklılıklar ve ilişkiler daha anlaşılır hale gelir. Böylece, birlikte değişimleri daha
+              az boyutlu bir uzayda grafiksel olarak göstermek mümkün olur. Bu sayede, sizin
+              için en uygun yeri belirlemek için işaretlediğiniz noktaların analiz sonuçlarını
+              kontrol ederek daha doğru bir karar vermenize yardımcı oluyoruz. </p>
+          <p>İşte başlamanıza yardımcı olacak bazı ipuçları:</p>
+            <ul>
+              <li class="items"><i class="fa fa-map-marker" aria-hidden="true"></i> - Bu haritaya bir marker eklemek için kullanılır.</li>
+              <li class="items">T - Bu buton bir katmanın açık veya kapalı olmasını değiştirmek için kullanılır.</li>
+              <li class="items">Show Table - Bu buton bir tablonun görüntülenmesi için kullanılır.</li>
+              <li class="items">Delete All - Bu buton harita üzerindeki tüm özellikleri silmek için kullanılır.</li>
+              <li class="items">Delete Last Feature - Bu buton haritaya son eklenen özelliği silmek için kullanılır.</li>
+              <li class="items">Save Features - Bu buton haritayı kaydetmek için kullanılır.</li>
+              <li class="items">Compare Markers - Bu buton eklenen marker özelliklerini karşılaştırmak için kullanılır.</li>
+              <li class="items"><i class="fa fa-map" aria-hidden="true"></i> Katmanları Göster - Bu buton farklı katmanlar seçmek için kullanılır.</li>
+            </ul>
+          <p class="created-by">Coğrafi Bilgi Sistemi Şube Müdürlüğü tarafından 💖 ile yapıldı.</p>
           <button class="close-btn">Close</button>
         </div>
         <table id="marker-table">
@@ -221,11 +260,11 @@
               <tbody>
               </tbody>
         </table>
+
     <script>
-                // Get the popup and the close button
+        // Get the popup and the close button
         const popup = document.querySelector('.popup');
         const closeBtn = popup.querySelector('.close-btn');
-                        // create a button to trigger the saveMap function
 
         // Add an event listener to the close button
         closeBtn.addEventListener('click', () => {
@@ -237,21 +276,23 @@
         window.addEventListener('load', () => {
           popup.style.display = 'block';
         });
+
         var showTableBtn = document.getElementById('show-table');
         var markerTable = document.getElementById('marker-table');
 
         showTableBtn.addEventListener('click', function() {
           markerTable.classList.toggle('show');
         });
+
         var map = L.map('map').setView([41.008806, 28.980162], 13);
-        var layer1 = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        })
 
         var esriLayer = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
           attribution: 'Tiles © Esri'
-        }).addTo(map);
+        })
 
         var mapboxStreets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -260,21 +301,21 @@
             tileSize: 512,
             zoomOffset: -1,
             accessToken: 'pk.eyJ1Ijoic3VrcnVidXJha2NldGluIiwiYSI6ImNsODM4cHg2YzAzNHozdWxoajU0dWt6ODgifQ.kqIwO3bpD-U5qrisUnJLIA'
-        }).addTo(map);
+        })
 
 
         var cartoPositron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: 'Tiles &copy; <a href="https://carto.com/">Carto</a>',
             subdomains: 'abcd',
             maxZoom: 19
-        }).addTo(map);
+        })
 
         var openTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
             maxZoom: 17,
             attribution: 'Map data &copy; <a href="https://opentopomap.org">OpenTopoMap</a> contributors, ' +
                 '<a href="http://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>',
             subdomains: ['a', 'b', 'c']
-        }).addTo(map);
+        })
 
         var stamenTerrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
             attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
@@ -284,15 +325,21 @@
             subdomains: 'abcd',
             minZoom: 0,
             maxZoom: 18
-        }).addTo(map);
+        })
 
+        // Add only the selected layer back to the map
+        var selectedLayer = mapboxStreets
+        selectedLayer.addTo(map);
+
+        // Add the layer control back to the map with only the selected layer option
         var layerControl = L.control.layers({
-            'Osm': layer1,
-            'Esri': esriLayer,
-            'Carto': cartoPositron,
-            'Otm': openTopoMap,
+            // Only show the selected layer in the layer control
+            'Mapbox': selectedLayer,
             'Stamen': stamenTerrain,
-             'Mapbox': mapboxStreets,
+            'Carto': cartoPositron,
+            'OpenTopo': openTopoMap,
+            'Esri': esriLayer,
+            'Osm': osmLayer
         }).addTo(map);
 
         // define the suitabilityLayer variable outside of the callback function
@@ -356,6 +403,7 @@
 
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
+
         var drawControl = new L.Control.Draw({
             edit: {
                 featureGroup: drawnItems,
@@ -373,6 +421,7 @@
                 polyline: false
             }
         });
+
         map.addControl(drawControl);
 
         let locationValuesList = [];
@@ -496,9 +545,7 @@
                 });
               }
             });
-
             map.addControl(new compareButton());
-
             drawnItems.addLayer(layer);
             // console.log(drawnItems.toGeoJSON());
         });
@@ -553,7 +600,7 @@
             link.click();
             document.body.removeChild(link);
         }
-        document.getElementById("save-map").addEventListener("click", saveData);
+        document.getElementById("save-features").addEventListener("click", saveData);
     </script>
 </body>
 </html>
