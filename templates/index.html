@@ -459,8 +459,8 @@
                         layer.bindPopup('Location: ' + locationValue + '<br>Latitude: ' + latlng.lat.toFixed(6) +
                             '<br>Longitude: ' + latlng.lng.toFixed(6) + '<br>ID: ' + response['id'] + '<br>GRIDCODE: '
                             + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'])
-                        gridcodeValue = isNaN(parseInt(response['gridcode'])) ? 0 : response['gridcode'];
-                        locationValuesList.push(parseInt(gridcodeValue));
+                        gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
+                        locationValuesList.push(parseFloat(gridcodeValue));
 
                     },
                     error: function(error) {
@@ -518,6 +518,7 @@
                 // Find the highest value in locationValuesList
 
                 var highestValue = Math.max.apply(Math, locationValuesList);
+                console.log("highestValue: ", highestValue)
 
                 // Loop through each layer in the drawnItems feature group
                 drawnItems.eachLayer(function(layer) {
@@ -525,7 +526,7 @@
                   if (layer instanceof L.Marker) {
                     // Get the location value from the marker's popup content
                     var popupContent = layer.getPopup().getContent();
-                    var locationValue = parseInt(popupContent.split('GRIDCODE: ')[1]);
+                    var locationValue = parseFloat(popupContent.split('GRIDCODE: ')[1]);
 
                     // If the location value matches the highest value, add a custom marker icon
                     if (locationValue === highestValue) {
