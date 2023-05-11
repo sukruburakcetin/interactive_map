@@ -354,7 +354,9 @@
           markerTable.classList.toggle('show');
         });
 
-        var map = L.map('map').setView([41.008806, 28.980162], 13);
+        var map = L.map('map', {
+              minZoom: 10
+            }).setView([41.188806, 28.980162], 10);
         var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
@@ -423,19 +425,19 @@
               var gridcode = feature.properties.gridcode;
               var fillColor;
 
-              if (gridcode === 1) {
-                  fillColor = 'black';
-              } else if (gridcode === 2) {
-                  fillColor = 'yellow';
-              } else if (gridcode ===3) {
-                  fillColor = 'red';
-              }
-              else if (gridcode === 4){
-                  fillColor = 'orange';
-              }
-              else{
-                  fillColor = 'purple'
-              }
+                if(gridcode === 0){
+                    fillColor = 'white'
+                }
+                else if (gridcode === 1) {
+                    fillColor = '#fff7bc';
+                } else if (gridcode === 2) {
+                    fillColor = '#fe9929';
+                } else if (gridcode ===3) {
+                    fillColor = '#ec7014';
+                }
+                else if (gridcode === 4){
+                    fillColor = '#8c2d04';
+                }
                 return {
                 color: '#000',
                 weight: 2,
@@ -458,19 +460,20 @@
               var gridcode = feature.properties.gridcode;
               var fillColor;
 
-              if (gridcode === 1) {
-                  fillColor = 'black';
-              } else if (gridcode === 2) {
-                  fillColor = 'yellow';
-              } else if (gridcode ===3) {
-                  fillColor = 'red';
-              }
-              else if (gridcode === 4){
-                  fillColor = 'orange';
-              }
-              else{
+              if(gridcode === 0){
                   fillColor = 'purple'
               }
+              else if (gridcode === 1) {
+                  fillColor = '#ffffb2';
+              } else if (gridcode === 2) {
+                  fillColor = '#fecc5c';
+              } else if (gridcode ===3) {
+                  fillColor = '#fd8d3c';
+              }
+              else if (gridcode === 4){
+                  fillColor = '#f03b20';
+              }
+
                 return {
                 color: '#000',
                 weight: 2,
@@ -493,24 +496,29 @@
               var gridcode = feature.properties.gridcode;
               var fillColor;
 
-              if (gridcode === 1) {
-                  fillColor = 'black';
+              if(gridcode === 0){
+                  fillColor = '#f2f0f7'
+              }
+              else if (gridcode === 1) {
+                  fillColor = '#dadaeb';
               } else if (gridcode === 2) {
-                  fillColor = 'yellow';
-              } else if (gridcode ===3) {
-                  fillColor = 'red';
+                  fillColor = '#bcbddc';
+              } else if (gridcode === 3) {
+                  fillColor = '#9e9ac8';
               }
               else if (gridcode === 4){
-                  fillColor = 'orange';
+                  fillColor = '#756bb1';
               }
-              else{
-                  fillColor = 'purple'
+              else if (gridcode === 5){
+                  fillColor = '#54278f';
               }
+
+
                 return {
                 color: '#000',
                 weight: 2,
                 opacity: 1,
-                fillOpacity: 0.9,
+                fillOpacity: 0.6,
                 fillColor: fillColor
               };
             }
@@ -528,7 +536,10 @@
               var gridcode = feature.properties.gridcode;
               var fillColor;
 
-              if (gridcode === 1) {
+              if(gridcode === 0){
+                  fillColor = 'purple'
+              }
+              else if (gridcode === 1) {
                   fillColor = 'black';
               } else if (gridcode === 2) {
                   fillColor = 'yellow';
@@ -538,9 +549,7 @@
               else if (gridcode === 4){
                   fillColor = 'orange';
               }
-              else{
-                  fillColor = 'purple'
-              }
+
                 return {
                 color: '#000',
                 weight: 2,
@@ -563,19 +572,19 @@
               var gridcode = feature.properties.gridcode;
               var fillColor;
 
-              if (gridcode === 1) {
-                  fillColor = 'black';
-              } else if (gridcode === 2) {
-                  fillColor = 'yellow';
-              } else if (gridcode ===3) {
-                  fillColor = 'red';
-              }
-              else if (gridcode === 4){
-                  fillColor = 'orange';
-              }
-              else{
-                  fillColor = 'purple'
-              }
+                if(gridcode === 0){
+                    fillColor = 'purple'
+                }
+                else if (gridcode === 1) {
+                    fillColor = 'black';
+                } else if (gridcode === 2) {
+                    fillColor = 'yellow';
+                } else if (gridcode ===3) {
+                    fillColor = 'red';
+                }
+                else if (gridcode === 4){
+                    fillColor = 'orange';
+                }
                 return {
                 color: '#000',
                 weight: 2,
@@ -606,10 +615,12 @@
             // define the contents of the legend
             legend.onAdd = function (map) {
               var div = L.DomUtil.create('div', 'info legend');
-              div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
-              div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
-              div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
-              div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Suitability Legend</h4>';
+                div.innerHTML += '<i style="background-color: white; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style=" margin:2px;">Ozel Alan</span><br>';
+                div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Uygun Degil</span><br>';
+                div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Az Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">En Uygun</span><br>';
               return div;
             };
 
