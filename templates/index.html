@@ -88,7 +88,7 @@
 
       #marker-table {
           position: absolute;
-          top: 330px;
+          top: 480px;
           left: 10px;
           margin-left:1px;
           font-size: 10px;
@@ -195,6 +195,71 @@
           color: #fff;
       }
 
+            /*toggle suitability layer*/
+      #toggle-layer1 {
+          position: absolute;
+          top: 360px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          width: 32px;
+      }
+
+      #toggle-layer1:hover {
+          background-color: #333;
+          color: #fff;
+      }
+      
+                  /*toggle suitability layer*/
+      #toggle-layer2 {
+          position: absolute;
+          top: 390px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          width: 32px;
+      }
+
+      #toggle-layer2:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+                        /*toggle suitability layer*/
+      #toggle-layer3 {
+          position: absolute;
+          top: 420px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          width: 32px;
+      }
+
+      #toggle-layer3:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+                        /*toggle suitability layer*/
+      #toggle-layer4 {
+          position: absolute;
+          top: 450px;
+          left: 10px;
+          margin-left:1px;
+          font-size: 10px;
+          z-index: 999;
+          width: 32px;
+      }
+
+      #toggle-layer4:hover {
+          background-color: #333;
+          color: #fff;
+      }
+
+
       .items{
           display: inline-block;
           font-size:14px;
@@ -224,6 +289,10 @@
         <button id="delete-features">Delete All</button>
         <button id="delete-last-feature">Delete Last Feature</button>
         <button id="save-features">Save All Features</button>
+        <button id="toggle-layer1">T1</button>
+        <button id="toggle-layer2">T2</button>
+        <button id="toggle-layer3">T3</button>
+        <button id="toggle-layer4">T4</button>
 
         <div class="popup">
           <h2 class="popup-tile">Uygunluk Analizi Simülasyon Motoru</h2>
@@ -346,25 +415,172 @@
         // define the suitabilityLayer variable outside of the callback function
         var suitabilityLayer;
 
-        $.getJSON('/static/kres_uygunluk.geojson', function(data) {
+        $.getJSON('/static/IHE_UYGUNLUK_2.json', function(data) {
           console.log(data); // log the GeoJSON data
           // create a new GeoJSON layer and assign it to the suitabilityLayer variable
           suitabilityLayer = L.geoJSON(data, {
             style: function(feature) {
-              var gridcode = feature.properties.GRIDCODE;
+              var gridcode = feature.properties.gridcode;
               var fillColor;
+
               if (gridcode === 1) {
-                fillColor = 'black';
+                  fillColor = 'black';
               } else if (gridcode === 2) {
-                fillColor = 'yellow';
-              } else {
-                fillColor = 'red';
+                  fillColor = 'yellow';
+              } else if (gridcode ===3) {
+                  fillColor = 'red';
               }
-              return {
+              else if (gridcode === 4){
+                  fillColor = 'orange';
+              }
+              else{
+                  fillColor = 'purple'
+              }
+                return {
                 color: '#000',
                 weight: 2,
                 opacity: 1,
-                fillOpacity: 0.2,
+                fillOpacity: 0.9,
+                fillColor: fillColor
+              };
+            }
+          });
+        });
+
+        // define the ulasmayanLayer variable outside of the callback function
+        var ulasmayanLayer;
+
+        $.getJSON('/static/IHE_ULASMAYAN_YAPI.json', function(data) {
+          console.log(data); // log the GeoJSON data
+          // create a new GeoJSON layer and assign it to the suitabilityLayer variable
+          ulasmayanLayer = L.geoJSON(data, {
+            style: function(feature) {
+              var gridcode = feature.properties.gridcode;
+              var fillColor;
+
+              if (gridcode === 1) {
+                  fillColor = 'black';
+              } else if (gridcode === 2) {
+                  fillColor = 'yellow';
+              } else if (gridcode ===3) {
+                  fillColor = 'red';
+              }
+              else if (gridcode === 4){
+                  fillColor = 'orange';
+              }
+              else{
+                  fillColor = 'purple'
+              }
+                return {
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9,
+                fillColor: fillColor
+              };
+            }
+          });
+        });
+        
+        // define the altmisLayer variable outside of the callback function
+        var altmisLayer;
+
+        $.getJSON('/static/ALTMIS_YAS_USTU_NUFUS.json', function(data) {
+          console.log(data); // log the GeoJSON data
+          // create a new GeoJSON layer and assign it to the suitabilityLayer variable
+          altmisLayer = L.geoJSON(data, {
+            style: function(feature) {
+              var gridcode = feature.properties.gridcode;
+              var fillColor;
+
+              if (gridcode === 1) {
+                  fillColor = 'black';
+              } else if (gridcode === 2) {
+                  fillColor = 'yellow';
+              } else if (gridcode ===3) {
+                  fillColor = 'red';
+              }
+              else if (gridcode === 4){
+                  fillColor = 'orange';
+              }
+              else{
+                  fillColor = 'purple'
+              }
+                return {
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9,
+                fillColor: fillColor
+              };
+            }
+          });
+        });
+
+        // define the mahNufusLayer variable outside of the callback function
+        var mahNufusLayer;
+
+        $.getJSON('/static/Mah_Nufus.json', function(data) {
+          console.log(data); // log the GeoJSON data
+          // create a new GeoJSON layer and assign it to the suitabilityLayer variable
+          mahNufusLayer = L.geoJSON(data, {
+            style: function(feature) {
+              var gridcode = feature.properties.gridcode;
+              var fillColor;
+
+              if (gridcode === 1) {
+                  fillColor = 'black';
+              } else if (gridcode === 2) {
+                  fillColor = 'yellow';
+              } else if (gridcode ===3) {
+                  fillColor = 'red';
+              }
+              else if (gridcode === 4){
+                  fillColor = 'orange';
+              }
+              else{
+                  fillColor = 'purple'
+              }
+                return {
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9,
+                fillColor: fillColor
+              };
+            }
+          });
+        });
+
+        // define the sesLayer variable outside of the callback function
+        var sesLayer;
+
+        $.getJSON('/static/SES.json', function(data) {
+          console.log(data); // log the GeoJSON data
+          // create a new GeoJSON layer and assign it to the suitabilityLayer variable
+          sesLayer = L.geoJSON(data, {
+            style: function(feature) {
+              var gridcode = feature.properties.gridcode;
+              var fillColor;
+
+              if (gridcode === 1) {
+                  fillColor = 'black';
+              } else if (gridcode === 2) {
+                  fillColor = 'yellow';
+              } else if (gridcode ===3) {
+                  fillColor = 'red';
+              }
+              else if (gridcode === 4){
+                  fillColor = 'orange';
+              }
+              else{
+                  fillColor = 'purple'
+              }
+                return {
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9,
                 fillColor: fillColor
               };
             }
@@ -401,6 +617,127 @@
             legend.addTo(map); // add the legend control to the map
           }
         });
+
+                // create a custom control for the legend
+        var legend1 = L.control({position: 'bottomright'});
+
+        // get the toggle layer button element
+        var toggleLayerBtn1 = document.getElementById('toggle-layer1');
+
+        // add an event listener to the button
+        toggleLayerBtn1.addEventListener('click', function() {
+          if (map.hasLayer(ulasmayanLayer)) {
+            // if the layer is currently visible, remove it from the map
+            map.removeLayer(ulasmayanLayer);
+            map.removeControl(legend1); // remove the legend control from the map
+          } else {
+            // if the layer is currently hidden, add it to the map
+            ulasmayanLayer.addTo(map);
+            // define the contents of the legend
+            legend1.onAdd = function (map) {
+              var div = L.DomUtil.create('div', 'info legend');
+              div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+              div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
+              div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
+              div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+              return div;
+            };
+
+            // add the legend control to the map
+            legend1.addTo(map); // add the legend control to the map
+          }
+        });
+        
+                       // create a custom control for the legend
+        var legend2 = L.control({position: 'bottomright'});
+
+        // get the toggle layer button element
+        var toggleLayerBtn2 = document.getElementById('toggle-layer2');
+
+        // add an event listener to the button
+        toggleLayerBtn2.addEventListener('click', function() {
+          if (map.hasLayer(altmisLayer)) {
+            // if the layer is currently visible, remove it from the map
+            map.removeLayer(altmisLayer);
+            map.removeControl(legend2); // remove the legend control from the map
+          } else {
+            // if the layer is currently hidden, add it to the map
+            altmisLayer.addTo(map);
+            // define the contents of the legend
+            legend2.onAdd = function (map) {
+              var div = L.DomUtil.create('div', 'info legend');
+              div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+              div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
+              div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
+              div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+              return div;
+            };
+
+            // add the legend control to the map
+            legend2.addTo(map); // add the legend control to the map
+          }
+        });
+
+                               // create a custom control for the legend
+        var legend3 = L.control({position: 'bottomright'});
+
+        // get the toggle layer button element
+        var toggleLayerBtn3 = document.getElementById('toggle-layer3');
+
+        // add an event listener to the button
+        toggleLayerBtn3.addEventListener('click', function() {
+          if (map.hasLayer(mahNufusLayer)) {
+            // if the layer is currently visible, remove it from the map
+            map.removeLayer(mahNufusLayer);
+            map.removeControl(legend3); // remove the legend control from the map
+          } else {
+            // if the layer is currently hidden, add it to the map
+            mahNufusLayer.addTo(map);
+            // define the contents of the legend
+            legend3.onAdd = function (map) {
+              var div = L.DomUtil.create('div', 'info legend');
+              div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+              div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
+              div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
+              div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+              return div;
+            };
+
+            // add the legend control to the map
+            legend3.addTo(map); // add the legend control to the map
+          }
+        });
+
+                                       // create a custom control for the legend
+        var legend4 = L.control({position: 'bottomright'});
+
+        // get the toggle layer button element
+        var toggleLayerBtn4 = document.getElementById('toggle-layer4');
+
+        // add an event listener to the button
+        toggleLayerBtn4.addEventListener('click', function() {
+          if (map.hasLayer(sesLayer)) {
+            // if the layer is currently visible, remove it from the map
+            map.removeLayer(sesLayer);
+            map.removeControl(legend4); // remove the legend control from the map
+          } else {
+            // if the layer is currently hidden, add it to the map
+            sesLayer.addTo(map);
+            // define the contents of the legend
+            legend4.onAdd = function (map) {
+              var div = L.DomUtil.create('div', 'info legend');
+              div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+              div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
+              div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
+              div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+              return div;
+            };
+
+            // add the legend control to the map
+            legend4.addTo(map); // add the legend control to the map
+          }
+        });
+
 
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
