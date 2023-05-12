@@ -24,7 +24,7 @@ def save_points():
     # Create a buffer around the Point object with a radius of 20 meters
     polygon = point.buffer(0.0002)  # 0.0002 is roughly equivalent to 20 meters
 
-    with open('C:/Users/sukruburak.cetin/Desktop/interactive_map/static/IHE_UYGUNLUK_2.json', 'r',
+    with open('./static/IHE_UYGUNLUK_2.json', 'r',
               encoding='utf-8') as f:
         ihe_uygunluk_geojson = json.load(f)
 
@@ -33,7 +33,7 @@ def save_points():
     # url_mah = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/mahalle_ilce.json'
     # mahalle_geojson = requests.get(url_mah).json()
 
-    with open('C:/Users/sukruburak.cetin/Desktop/interactive_map/static/mahalle_ilce.json', 'r', encoding='utf-8') as f:
+    with open('./static/mahalle_ilce.json', 'r', encoding='utf-8') as f:
         mahalle_geojson = json.load(f)
 
     mah_ad = ""
