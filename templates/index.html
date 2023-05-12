@@ -807,7 +807,7 @@
                         // Add the properties to the marker popup
                         layer.bindPopup('Location: ' + locationValue + '<br>Latitude: ' + latlng.lat.toFixed(6) +
                             '<br>Longitude: ' + latlng.lng.toFixed(6) + '<br>ID: ' + response['id'] + '<br>GRIDCODE: '
-                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'])
+                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'] + '<br>Neighboorhood: '+ response['mahalle_ad'] + '<br>District: '+ response['ilce_ad'])
                         gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                         locationValuesList.push(parseFloat(gridcodeValue));
 
