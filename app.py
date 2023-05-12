@@ -18,7 +18,7 @@ def save_points():
     index_no = 0
     # Get the points data from the AJAX request
     points = request.json.get('points')
-    print(points)  # do something with the points data here
+    # print(points)  # do something with the points data here
     # center point provided by the user
     point = Point(points['geometry']['coordinates'][0], points['geometry']['coordinates'][1])
     # Create a buffer around the Point object with a radius of 20 meters
@@ -45,8 +45,8 @@ def save_points():
             mah_ad = mahalle_geojson['features'][k]['properties']['MAH_AD']
             ilce_ad = mahalle_geojson['features'][k]['properties']['ILCE_AD']
 
-    print("mah_ad: ", mah_ad)
-    print("ilce_ad: ", ilce_ad)
+    # print("mah_ad: ", mah_ad)
+    # print("ilce_ad: ", ilce_ad)
 
     # Find all the shapes that intersect with the polygon
     intersecting_shapes = []
