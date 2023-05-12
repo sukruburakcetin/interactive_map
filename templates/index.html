@@ -135,15 +135,40 @@
           text-align:center;
       }
 
-      #menu{
-          position: absolute;
+      /*#menu{*/
+      /*    position: absolute;*/
+      /*    height: 38px;*/
+      /*    width: 38px;*/
+      /*    top: 125px;*/
+      /*    background-color: white;*/
+      /*    z-index: 2;*/
+      /*    border-radius: 5px;*/
+      /*}*/
+
+      #menu {
+           position: absolute;
           height: 38px;
           width: 38px;
           top: 125px;
-          background-color: white;
           z-index: 2;
           border-radius: 5px;
-      }
+          background: #009578;
+          color: #ffffff;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+          text-decoration: none;
+          transition: background 0.2s;
+          z-index: 2;
+        }
+
+        #menu:hover {
+          background: #00866c;
+        }
+
 
       #button-container{
           position: relative;
@@ -163,6 +188,8 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          font-family:"Calibri Light";
+          font-size:8px;
       }
 
       #toggle-layer1{
@@ -171,6 +198,8 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          font-family: "Calibri Light";
+          font-size:9px;
       }
 
       #toggle-layer2{
@@ -179,6 +208,8 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          font-family: "Calibri Light";
+          font-size: 9px;
       }
 
       #toggle-layer3{
@@ -187,6 +218,8 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          font-family: "Calibri Light";
+          font-size:9px;
       }
 
       #toggle-layer4{
@@ -195,6 +228,9 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          padding: 3px;
+          font-family: "Calibri Light";
+          font-size: 9px;
       }
 
       #show-table{
@@ -203,6 +239,9 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          padding: 3px;
+          font-family: "Calibri Light";
+          font-size: 9px;
       }
 
       #delete-features{
@@ -211,6 +250,9 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          padding: 3px;
+          font-family: "Calibri Light";
+          font-size: 9px;
       }
 
       #delete-last-feature{
@@ -219,6 +261,9 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          padding: 3px;
+          font-family: "Calibri Light";
+          font-size: 9px;
       }
 
       #save-features{
@@ -227,12 +272,19 @@
           width: 32px;
           height: 32px;
           margin: 3px;
+          padding: 3px;
+          font-family: "Calibri Light";
+          font-size: 9px;
       }
     </style>
 <body>
         <div id="map" ></div>
-        <button id="menu">X</button>
-
+<!--        <button id="menu">X</button>-->
+         <button id="menu" type="button">
+            <ion-icon name="menu-outline" size="large"></ion-icon>
+         </button>
+        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+        <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
         <div id="button-container">
             <button id="toggle-layer">T</button>
             <button id="toggle-layer1">T1</button>
@@ -241,9 +293,8 @@
             <button id="toggle-layer4">T4</button>
             <button id="show-table">Show Table</button>
             <button id="delete-features">Delete All</button>
-            <button id="delete-last-feature">Delete Last Feature</button>
-            <button id="save-features">Save All Features</button>
-
+            <button id="delete-last-feature">Delete Last</button>
+            <button id="save-features">Save All</button>
         </div>
 
         <div class="popup">
@@ -293,11 +344,11 @@
         function scrollMenu(){
             if (checker % 2 == 0){
                 console.log('1')
-                btnContainer.style.left = "10px";
+                btnContainer.style.left = "1px";
                 checker += 1
             } else{
                 console.log('2')
-                btnContainer.style.left = "-60px";
+                btnContainer.style.left = "-50px";
                 checker += 1
             }
         }
