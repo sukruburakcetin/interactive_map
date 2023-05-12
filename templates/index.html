@@ -609,8 +609,25 @@
             // if the layer is currently visible, remove it from the map
             map.removeLayer(suitabilityLayer);
             map.removeControl(legend); // remove the legend control from the map
+              console.log("mokoko")
+
+
           } else {
             // if the layer is currently hidden, add it to the map
+                            try{
+                map.removeLayer(ulasmayanLayer);
+                map.removeLayer(altmisLayer);
+                map.removeLayer(mahNufusLayer);
+                map.removeLayer(sesLayer);
+                map.removeControl(legend1);
+                map.removeControl(legend2);
+                map.removeControl(legend3);
+                map.removeControl(legend4);
+              }
+                catch
+              {
+                console.log("asd")
+                }
             suitabilityLayer.addTo(map);
             // define the contents of the legend
             legend.onAdd = function (map) {
@@ -642,6 +659,20 @@
             map.removeLayer(ulasmayanLayer);
             map.removeControl(legend1); // remove the legend control from the map
           } else {
+                                          try{
+                map.removeLayer(suitabilityLayer);
+                map.removeLayer(altmisLayer);
+                map.removeLayer(mahNufusLayer);
+                map.removeLayer(sesLayer);
+                map.removeControl(legend);
+                map.removeControl(legend2);
+                map.removeControl(legend3);
+                map.removeControl(legend4);
+              }
+                catch
+              {
+                console.log("asd")
+                }
             // if the layer is currently hidden, add it to the map
             ulasmayanLayer.addTo(map);
             // define the contents of the legend
@@ -672,6 +703,20 @@
             map.removeLayer(altmisLayer);
             map.removeControl(legend2); // remove the legend control from the map
           } else {
+                                          try{
+                map.removeLayer(ulasmayanLayer);
+                map.removeLayer(suitabilityLayer);
+                map.removeLayer(mahNufusLayer);
+                map.removeLayer(sesLayer);
+                map.removeControl(legend);
+                map.removeControl(legend1);
+                map.removeControl(legend3);
+                map.removeControl(legend4);
+              }
+                catch
+              {
+                console.log("asd")
+                }
             // if the layer is currently hidden, add it to the map
             altmisLayer.addTo(map);
             // define the contents of the legend
@@ -703,6 +748,20 @@
             map.removeControl(legend3); // remove the legend control from the map
           } else {
             // if the layer is currently hidden, add it to the map
+                                          try{
+                map.removeLayer(ulasmayanLayer);
+                map.removeLayer(altmisLayer);
+                map.removeLayer(sesLayer);
+                map.removeLayer(suitabilityLayer);
+                map.removeControl(legend);
+                map.removeControl(legend1);
+                map.removeControl(legend2);
+                map.removeControl(legend4);
+              }
+                catch
+              {
+                console.log("asd")
+                }
             mahNufusLayer.addTo(map);
             // define the contents of the legend
             legend3.onAdd = function (map) {
@@ -733,6 +792,20 @@
             map.removeControl(legend4); // remove the legend control from the map
           } else {
             // if the layer is currently hidden, add it to the map
+                                                        try{
+                map.removeLayer(ulasmayanLayer);
+                map.removeLayer(altmisLayer);
+                map.removeLayer(mahNufusLayer);
+                map.removeLayer(suitabilityLayer);
+                map.removeControl(legend);
+                map.removeControl(legend1);
+                map.removeControl(legend2);
+                map.removeControl(legend3);
+              }
+                catch
+              {
+                console.log("asd")
+                }
             sesLayer.addTo(map);
             // define the contents of the legend
             legend4.onAdd = function (map) {
