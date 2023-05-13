@@ -89,7 +89,7 @@
 
       #marker-table {
           position: absolute;
-          top: 480px;
+          top: 580px;
           left: 10px;
           margin-left:1px;
           font-size: 10px;
@@ -900,10 +900,9 @@
                         // Add the properties to the marker popup
                         layer.bindPopup('Location: ' + locationValue + '<br>Latitude: ' + latlng.lat.toFixed(6) +
                             '<br>Longitude: ' + latlng.lng.toFixed(6) + '<br>ID: ' + response['id'] + '<br>GRIDCODE: '
-                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'] + '<br>Neighboorhood: '+ response['mahalle_ad'] + '<br>District: '+ response['ilce_ad'])
+                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'] + '<br>Neighboorhood: '+ response['mahalle_ad'] + '<br>District: '+ response['ilce_ad'] + '<br><a href="https://www.google.com/maps?layer=c&cbll=' + String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
                         gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                         locationValuesList.push(parseFloat(gridcodeValue));
-
                     },
                     error: function(error) {
                         console.log("fail_return_log", error);
