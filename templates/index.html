@@ -1003,6 +1003,7 @@
             var lastLayer = addedLayers.slice(-1)[0]; // Remove the last layer and get a reference to it
             if (lastLayer) { // Check if the last layer exists
                 map.removeLayer(lastLayer); // Remove the last layer from the map
+                locationValuesList.pop()
             }
             $('#marker-table tbody tr:last').remove();
 
