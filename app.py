@@ -33,19 +33,29 @@ def save_points():
     # url_mah = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/mahalle_ilce.json'
     # mahalle_geojson = requests.get(url_mah).json()
 
-    with open('./static/mahalle_ilce.json', 'r', encoding='utf-8') as f:
+    with open('./static/ALLFEATURES.json', 'r', encoding='utf-8') as f:
         mahalle_geojson = json.load(f)
 
     mah_ad = ""
     ilce_ad = ""
+    nufus = ""
+    ses_segment = ""
+    yapi_nufus = ""
+    yapi_sayisi = ""
 
     for k in range(0, len(mahalle_geojson['features'])):
         current_mahalle_geojson = shape(mahalle_geojson['features'][k]['geometry'])
         if point.intersects(current_mahalle_geojson):
             mah_ad = mahalle_geojson['features'][k]['properties']['MAH_AD']
             ilce_ad = mahalle_geojson['features'][k]['properties']['ILCE_AD']
+            ses_segment = mahalle_geojson['features'][k]['properties']['SES_SEGMENT']
+            nufus = mahalle_geojson['features'][k]['properties']['NUFUS']
+            yapi_nufus = mahalle_geojson['features'][k]['properties']['YAPI_NUFUS']
+            yapi_sayisi = mahalle_geojson['features'][k]['properties']['YAPI_SAYISI']
 
-    # print("mah_ad: ", mah_ad)
+
+
+        # print("mah_ad: ", mah_ad)
     # print("ilce_ad: ", ilce_ad)
 
     # Find all the shapes that intersect with the polygon
@@ -69,8 +79,8 @@ def save_points():
             # kesisim alanını, marker'ın kesisim alanına bölüyorum
             # misal 0.80/1 gibi
             proportion_within_shape = intersection.area / polygon.area
-            print("proportion within shape: ", proportion_within_shape)
-            print("proportion within shape: ", current_ihe_uygunluk_shape)
+            # print("proportion within shape: ", proportion_within_shape)
+            # print("proportion within shape: ", current_ihe_uygunluk_shape)
             suitability_values.append({
                 'gridcode': ihe_uygunluk_geojson['features'][intersecting_shapes_indexes[index_no]]['properties'][
                     'gridcode'],
@@ -114,7 +124,13 @@ def save_points():
             },
             'id': 0,
             'gridcode': final_suitability_value,
-            'suitability': suitability
+            'suitability': suitability,
+            'mahalle_ad': mah_ad,
+            'ilce_ad': ilce_ad,
+            'ses_segment': ses_segment,
+            'nufus': nufus,
+            'yapi_nufus': yapi_nufus,
+            'yapi_sayisi': yapi_sayisi
         }
         intersecting_shapes.clear()
         intersecting_shapes_indexes.clear()
@@ -145,7 +161,11 @@ def save_points():
                     'gridcode': ihe_uygunluk_geojson['features'][i]['properties']['gridcode'],
                     'suitability': suitability_condition,
                     'mahalle_ad': mah_ad,
-                    'ilce_ad': ilce_ad
+                    'ilce_ad': ilce_ad,
+                    'ses_segment': ses_segment,
+                    'nufus': nufus,
+                    'yapi_nufus': yapi_nufus,
+                    'yapi_sayisi': yapi_sayisi
                 }
         if thereIsAPolygon == 0:
             feature = {
@@ -158,7 +178,11 @@ def save_points():
                 'gridcode': " ",
                 'suitability': " ",
                 'mahalle_ad': " ",
-                'ilce_ad': " "
+                'ilce_ad': " ",
+                'ses_segment': " ",
+                'nufus': " ",
+                'yapi_nufus': " ",
+                'yapi_sayisi': " "
             }
         # Return the GeoJSON Feature object as a JSON response
     return jsonify(feature)

@@ -233,7 +233,7 @@
           font-size: 9px;
       }
 
-      #show-table{
+      #toggle-layer5{
           position: absolute;
           top: 210px;
           width: 32px;
@@ -244,7 +244,7 @@
           font-size: 9px;
       }
 
-      #delete-features{
+      #show-table{
           position: absolute;
           top: 250px;
           width: 32px;
@@ -255,7 +255,7 @@
           font-size: 9px;
       }
 
-      #delete-last-feature{
+      #delete-features{
           position: absolute;
           top: 290px;
           width: 32px;
@@ -266,9 +266,20 @@
           font-size: 9px;
       }
 
-      #save-features{
+      #delete-last-feature{
           position: absolute;
           top: 330px;
+          width: 32px;
+          height: 32px;
+          margin: 3px;
+          padding: 3px;
+          font-family: "Calibri Light";
+          font-size: 9px;
+      }
+
+      #save-features{
+          position: absolute;
+          top: 370px;
           width: 32px;
           height: 32px;
           margin: 3px;
@@ -291,6 +302,7 @@
             <button id="toggle-layer2">T2</button>
             <button id="toggle-layer3">T3</button>
             <button id="toggle-layer4">T4</button>
+            <button id="toggle-layer5">T5</button>
             <button id="show-table">Show Table</button>
             <button id="delete-features">Delete All</button>
             <button id="delete-last-feature">Delete Last</button>
@@ -616,6 +628,32 @@
           });
         });
 
+               // define the sesLayer variable outside of the callback function
+        var mah_layer;
+
+        $.getJSON('/static/mah_layer.geojson', function(data) {
+          console.log(data); // log the GeoJSON data
+          // create a new GeoJSON layer and assign it to the suitabilityLayer variable
+          mah_layer = L.geoJSON(data, {
+            style: function(feature) {
+              var gridcode = feature.properties.ILCEKN;
+              var fillColor;
+                if(gridcode === 1782){
+                    fillColor = 'purple'
+                }
+
+                return {
+                color: '#000',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.9,
+                fillColor: fillColor
+              };
+            }
+          });
+        });
+
+
 
         // create a custom control for the legend
         var legend = L.control({position: 'bottomright'});
@@ -842,6 +880,50 @@
           }
         });
 
+                                               // create a custom control for the legend
+        var legend5 = L.control({position: 'bottomright'});
+
+        // get the toggle layer button element
+        var toggleLayerBtn5 = document.getElementById('toggle-layer5');
+
+        // add an event listener to the button
+        toggleLayerBtn5.addEventListener('click', function() {
+          if (map.hasLayer(mah_layer)) {
+            // if the layer is currently visible, remove it from the map
+            map.removeLayer(mah_layer);
+            map.removeControl(legend5); // remove the legend control from the map
+          } else {
+            // if the layer is currently hidden, add it to the map
+              try{
+                map.removeLayer(ulasmayanLayer);
+                map.removeLayer(altmisLayer);
+                map.removeLayer(mahNufusLayer);
+                map.removeLayer(suitabilityLayer);
+                map.removeControl(legend);
+                map.removeControl(legend1);
+                map.removeControl(legend2);
+                map.removeControl(legend3);
+              }
+                catch
+              {
+                console.log("asd")
+                }
+            mah_layer.addTo(map);
+            // define the contents of the legend
+            legend5.onAdd = function (map) {
+              var div = L.DomUtil.create('div', 'info legend');
+              div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+              div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
+              div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
+              div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+              return div;
+            };
+
+            // add the legend control to the map
+            legend5.addTo(map); // add the legend control to the map
+          }
+        });
+
 
         var drawnItems = new L.FeatureGroup();
         map.addLayer(drawnItems);
@@ -900,7 +982,7 @@
                         // Add the properties to the marker popup
                         layer.bindPopup('Location: ' + locationValue + '<br>Latitude: ' + latlng.lat.toFixed(6) +
                             '<br>Longitude: ' + latlng.lng.toFixed(6) + '<br>ID: ' + response['id'] + '<br>GRIDCODE: '
-                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'] + '<br>Neighboorhood: '+ response['mahalle_ad'] + '<br>District: '+ response['ilce_ad'] + '<br><a href="https://www.google.com/maps?layer=c&cbll=' + String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
+                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'] + '<br>Neighboorhood: '+ response['mahalle_ad'] + '<br>ilce_ad: '+ response['ilce_ad'] + '<br>ses_segment: '+ response['ses_segment'] + '<br>nufus: '+ response['nufus'] + '<br>yapi_nufus: '+ response['yapi_nufus'] + '<br>yapi_sayisi: '+ response['yapi_sayisi'] + '<br><a href="https://www.google.com/maps?layer=c&cbll=' + String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
                         gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                         locationValuesList.push(parseFloat(gridcodeValue));
                     },
@@ -956,35 +1038,40 @@
               },
 
               _onClick: function () {
-                // Find the highest value in locationValuesList
+                  // Find the highest value in locationValuesList
 
-                var highestValue = Math.max.apply(Math, locationValuesList);
-                console.log("highestValue: ", highestValue)
+                  var highestValue = Math.max.apply(Math, locationValuesList);
+                  console.log("highestValue: ", highestValue)
+                  if(highestValue > 0){
 
-                // Loop through each layer in the drawnItems feature group
-                drawnItems.eachLayer(function(layer) {
-                  // Check if the layer is a marker
-                  if (layer instanceof L.Marker) {
-                    // Get the location value from the marker's popup content
-                    var popupContent = layer.getPopup().getContent();
-                    var locationValue = parseFloat(popupContent.split('GRIDCODE: ')[1]);
+                      // Loop through each layer in the drawnItems feature group
+                      drawnItems.eachLayer(function (layer) {
+                          // Check if the layer is a marker
+                          if (layer instanceof L.Marker) {
+                              // Get the location value from the marker's popup content
+                              var popupContent = layer.getPopup().getContent();
+                              var locationValue = parseFloat(popupContent.split('GRIDCODE: ')[1]);
 
-                    // If the location value matches the highest value, add a custom marker icon
-                    if (locationValue === highestValue) {
-                      var marker = layer.setIcon(new L.Icon({
-                        iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
-                        iconSize: [64, 64],
-                        iconAnchor: [32, 64],
-                        popupAnchor: [0, -56]
-                      }));
-                        marker.bindTooltip('Bu bölge diğerlerine göre daha uygun: ' + locationValue);
-                        marker.addTo(map);
-                        setTimeout(function() {
-                          marker.openTooltip();
-                        }, 100);
-                    }
+                              // If the location value matches the highest value, add a custom marker icon
+                              if (locationValue === highestValue) {
+                                  var marker = layer.setIcon(new L.Icon({
+                                      iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
+                                      iconSize: [64, 64],
+                                      iconAnchor: [32, 64],
+                                      popupAnchor: [0, -56]
+                                  }));
+                                  marker.bindTooltip('Bu bölge diğerlerine göre daha uygun: ' + locationValue);
+                                  marker.addTo(map);
+                                  setTimeout(function () {
+                                      marker.openTooltip();
+                                  }, 100);
+                              }
+                          }
+                      });
+              }
+                  else{
+                      alert("Uygun alan yok!");
                   }
-                });
               }
             });
             map.addControl(new compareButton());
