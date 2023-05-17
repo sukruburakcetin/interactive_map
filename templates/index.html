@@ -1063,7 +1063,7 @@
                           if (layer instanceof L.Marker) {
                               // Get the location value from the marker's popup content
                               var popupContent = layer.getPopup().getContent();
-                              var locationValue = parseFloat(popupContent.split('GRIDCODE: ')[1]);
+                              var locationValue = parseFloat(popupContent.split('Gridcode: ')[1]);
 
                               // If the location value matches the highest value, add a custom marker icon
                               if (locationValue === highestValue) {
