@@ -39,6 +39,20 @@ def save_points():
     # cnx.commit()
     # cnx.close()
 
+    lokasyon_list = list()
+    enlem_list = list()
+    boylam_list = list()
+    id_list = list()
+    gridcode_list = list()
+    uygunluk_list = list()
+    mahalle_list = list()
+    ilce_list = list()
+    seg_segment_list = list()
+    nufus_list = list()
+    yapi_nufus_list = list()
+    yapi_sayisi_list = list()
+    potansiyel_satis_list = list()
+
     index_no = 0
     # Get the points data from the AJAX request
     points = request.json.get('points')

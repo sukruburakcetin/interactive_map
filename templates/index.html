@@ -9,6 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
     <style>
       #map {
@@ -20,6 +22,10 @@
         height: 100vh;
         width: 100vw;
         z-index: 1;
+      }
+      body{
+       width: 98%;
+       width: 98%;
       }
 
       .leaflet-right .leaflet-control {
@@ -87,9 +93,10 @@
         background-color: #eee;
       }
 
+
       #marker-table {
           position: absolute;
-          top: 580px;
+          top: 620px;
           left: 10px;
           margin-left:1px;
           font-size: 10px;
@@ -98,20 +105,35 @@
           display: none; /* hide the table by default */
           border: 2px black solid;
           background-color: white;
+
+          border-radius: 5px;
       }
+
+        #marker-table tbody tr:nth-child(odd) {
+            background-color: #c9c9d2;
+        }
+      #marker-table thead tr {
+            background-color: #eeeef3;
+        }
+
+      #marker-table tbody tr:nth-child(even) {
+            background-color: #929298;
+      }
+
+
 
       #marker-table.show {
         display: table; /* show the table when the "show" class is added */
+                    max-height: 250px; /* Set a maximum height for the container */
+          overflow-y: auto; /* Enable vertical scroll when content exceeds the container's height */
       }
 
       #marker-table th,
       #marker-table td {
           border: 1px solid black;
           padding: 5px;
+          border-radius: 5px;
       }
-      /*toggle suitability layer*/
-
-
 
       .items{
           display: inline-block;
@@ -135,20 +157,11 @@
           text-align:center;
       }
 
-      /*#menu{*/
-      /*    position: absolute;*/
-      /*    height: 38px;*/
-      /*    width: 38px;*/
-      /*    top: 125px;*/
-      /*    background-color: white;*/
-      /*    z-index: 2;*/
-      /*    border-radius: 5px;*/
-      /*}*/
-
       #menu {
-           position: absolute;
-          height: 38px;
-          width: 38px;
+          position: absolute;
+          height: 45px;
+          width: 45px;
+          margin-left:-4px;
           top: 125px;
           z-index: 2;
           border-radius: 5px;
@@ -175,6 +188,7 @@
           height: 400px;
           width: 45px;
           top: 157px;
+          margin-left: -1px;
           left: -60px;
           background-color: transparent;
           border-radius: 5px;
@@ -189,7 +203,8 @@
           height: 32px;
           margin: 3px;
           font-family:"Calibri Light";
-          font-size:8px;
+          font-size:18px;
+          border-radius: 5px;
       }
 
       #toggle-layer1{
@@ -199,7 +214,8 @@
           height: 32px;
           margin: 3px;
           font-family: "Calibri Light";
-          font-size:9px;
+          font-size:18px;
+          border-radius: 5px;
       }
 
       #toggle-layer2{
@@ -209,7 +225,8 @@
           height: 32px;
           margin: 3px;
           font-family: "Calibri Light";
-          font-size: 9px;
+          font-size:18px;
+          border-radius: 5px;
       }
 
       #toggle-layer3{
@@ -219,7 +236,8 @@
           height: 32px;
           margin: 3px;
           font-family: "Calibri Light";
-          font-size:9px;
+          font-size:18px;
+          border-radius: 5px;
       }
 
       #toggle-layer4{
@@ -230,7 +248,8 @@
           margin: 3px;
           padding: 3px;
           font-family: "Calibri Light";
-          font-size: 9px;
+          font-size:18px;
+          border-radius: 5px;
       }
 
       #toggle-layer5{
@@ -241,7 +260,8 @@
           margin: 3px;
           padding: 3px;
           font-family: "Calibri Light";
-          font-size: 9px;
+          font-size:18px;
+          border-radius: 5px;
       }
 
       #show-table{
@@ -252,7 +272,8 @@
           margin: 3px;
           padding: 3px;
           font-family: "Calibri Light";
-          font-size: 9px;
+          font-size: 18px;
+          border-radius: 5px;
       }
 
       #delete-features{
@@ -263,7 +284,8 @@
           margin: 3px;
           padding: 3px;
           font-family: "Calibri Light";
-          font-size: 9px;
+          font-size: 18px;
+          border-radius: 5px;
       }
 
       #delete-last-feature{
@@ -274,10 +296,11 @@
           margin: 3px;
           padding: 3px;
           font-family: "Calibri Light";
-          font-size: 9px;
+          font-size: 18px;
+          border-radius: 5px;
       }
 
-      #save-features{
+      #delete-selected-feature{
           position: absolute;
           top: 370px;
           width: 32px;
@@ -285,7 +308,20 @@
           margin: 3px;
           padding: 3px;
           font-family: "Calibri Light";
-          font-size: 9px;
+          font-size: 18px;
+          border-radius: 5px;
+      }
+
+      #save-features{
+          position: absolute;
+          top: 410px;
+          width: 32px;
+          height: 32px;
+          margin: 3px;
+          padding: 3px;
+          font-family: "Calibri Light";
+          font-size: 18px;
+          border-radius: 5px;
       }
     </style>
 <body>
@@ -294,19 +330,41 @@
          <button id="menu" type="button">
             <ion-icon name="menu-outline" size="large"></ion-icon>
          </button>
-        <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
-        <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
         <div id="button-container">
-            <button id="toggle-layer">T</button>
-            <button id="toggle-layer1">T1</button>
-            <button id="toggle-layer2">T2</button>
-            <button id="toggle-layer3">T3</button>
-            <button id="toggle-layer4">T4</button>
-            <button id="toggle-layer5">T5</button>
-            <button id="show-table">Show Table</button>
-            <button id="delete-features">Delete All</button>
-            <button id="delete-last-feature">Delete Last</button>
-            <button id="save-features">Save All</button>
+            <button title="Uygunluk Katmanı" id="toggle-layer">
+                <ion-icon name="layers"></ion-icon>
+            </button>
+            <button id="toggle-layer1">
+                <ion-icon name="layers"></ion-icon>
+            </button>
+            <button id="toggle-layer2">
+                <ion-icon name="layers"></ion-icon>
+            </button>
+            <button id="toggle-layer3">
+                <ion-icon name="layers"></ion-icon>
+            </button>
+            <button id="toggle-layer4">
+                <ion-icon name="layers"></ion-icon>
+            </button>
+            <button id="toggle-layer5">
+                <ion-icon name="layers"></ion-icon>
+            </button>
+            <button id="show-table">
+                <ion-icon name="analytics-sharp"></ion-icon>
+            </button>
+            <button id="delete-features">
+                <ion-icon name="trash"></ion-icon>
+            </button>
+            <button id="delete-last-feature">
+                <ion-icon name="arrow-back"></ion-icon>
+            </button>
+            <button id="delete-selected-feature">
+                <ion-icon name="close"></ion-icon>
+            </button>
+            <button id="save-features">
+                <ion-icon name="save"></ion-icon>
+            </button>
         </div>
 
         <div class="popup">
@@ -331,20 +389,29 @@
           <p class="created-by">Coğrafi Bilgi Sistemi Şube Müdürlüğü tarafından 💖 ile yapıldı.</p>
           <button class="close-btn">Close</button>
         </div>
+
         <table id="marker-table">
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Location</th>
-                  <th>Latitude</th>
-                  <th>Longitude</th>
+                  <th>LOKASYON</th>
+                  <th>ENLEM</th>
+                  <th>BOYLAM</th>
                   <th>GRIDCODE</th>
-                  <th>SUITABILITY</th>
+                  <th>UYGUNLUK</th>
+                  <th>MAHALLE</th>
+                  <th>ILCE</th>
+                  <th>SES_SEGMENT</th>
+                  <th>NUFUS</th>
+                  <th>YAPI_NUFUS</th>
+                  <th>YAPI_SAYISI</th>
+                  <th>POTANSIYEL_SATIS</th>
                 </tr>
               </thead>
               <tbody>
               </tbody>
         </table>
+
 
     <script>
         var menuBtn = document.getElementById('menu')
@@ -430,6 +497,7 @@
             minZoom: 0,
             maxZoom: 18
         })
+
 
         // Add only the selected layer back to the map
         var selectedLayer = mapboxStreets
@@ -969,15 +1037,22 @@
                         console.log("success_return_log", response);
                         addedLayer = L.geoJSON(response).addTo(map);
                         addedLayers.push(addedLayer);
-                          var newRow = '<tr>' +
+                        var newRow = '<tr>' +
                             '<td>' + response['id'] + '</td>' +
                             '<td>' + locationValue + '</td>' +
                             '<td>' + latlng.lat.toFixed(6) + '</td>' +
                             '<td>' + latlng.lng.toFixed(6) + '</td>' +
                             '<td>' + response.gridcode + '</td>' +
                             '<td>' + response.suitability + '</td>' +
+                            '<td>' + response.mahalle_ad + '</td>' +
+                            '<td>' + response.ilce_ad + '</td>' +
+                            '<td>' + response.ses_segment + '</td>' +
+                            '<td>' + response.nufus + '</td>' +
+                            '<td>' + response.yapi_nufus + '</td>' +
+                            '<td>' + response.yapi_sayisi + '</td>' +
+                            '<td>' + response.potansiyel_satis + '</td>' +
                             '</tr>';
-                      $('#marker-table tbody').append(newRow);
+                        $('#marker-table tbody').append(newRow);
 
                         // Add the properties to the marker popup
                         layer.bindPopup(
@@ -998,6 +1073,7 @@
                             String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
                         gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                         locationValuesList.push(parseFloat(gridcodeValue));
+                        console.log("eren mert mokoko:", locationValuesList)
                     },
                     error: function(error) {
                         console.log("fail_return_log", error);
@@ -1109,6 +1185,48 @@
 
         });
 
+        var deleteSelectedFeaturebutton = document.getElementById('delete-selected-feature');
+
+                // Add a click event listener to the button
+        deleteSelectedFeaturebutton.addEventListener('click', function() {
+
+                        // Add markers to the map
+            drawnItems.getLayers().forEach(function(marker) {
+
+                // Attach a click event listener to each marker
+                marker.on('click', function(event) {
+                    console.log('Marker clicked!');
+
+                    console.log(marker._latlng)
+                    for (var i=0; i < drawnItems.getLayers().length; i++)
+                    {
+                        console.log(drawnItems.getLayers()[i]._latlng)
+                        if (marker._latlng === drawnItems.getLayers()[i]._latlng)
+                        {
+                            // Perform any desired actions when a marker is clicked
+                            var currentMarker = drawnItems.getLayers()[i]
+                            var selectedMarkerOfLayer =addedLayers.splice(i, 1)[0];
+                             drawnItems.removeLayer(currentMarker);
+                             map.removeLayer(selectedMarkerOfLayer)
+                             locationValuesList.splice(i, 1);
+                            console.log("eren mert mokoko after:", locationValuesList)
+                             var tableBody = document.querySelector("#marker-table tbody");
+                            var rows = tableBody.getElementsByTagName("tr");
+
+                            if (i >= 0 && i < rows.length) {
+                              var rowToRemove = rows[i];
+                              rowToRemove.remove();
+                            }
+
+                        }
+                    }
+
+                });
+            });
+
+
+        });
+
         // Get the "Delete All Layers" button element
         var deleteButton = document.getElementById('delete-features');
 
@@ -1127,17 +1245,21 @@
         });
 
         function saveData() {
-            var csv = "ID, LOCATION, LATITUDE, LONGITUDE, GRIDCODE, SUITABILITY\n";
+            var csv = "ID, LOKASYON, ENLEM, BOYLAM, GRIDCODE, UYGUNLUK, MAHALLE, ILCE, SES_SEGMENT, NUFUS, YAPI_NUFUS, YAPI_SAYISI, POTALSIYEL_SATIS\n";
             $('#marker-table tbody tr').each(function(index, row) {
                 // Do something with the row, for example:
                 csv += $(row).find('td:first').text() + "," + $(row).find('td:eq(1)').text() + ","
                     + $(row).find('td:eq(2)').text() + "," + $(row).find('td:eq(3)').text()
-                    + "," + $(row).find('td:eq(4)').text() + "," + $(row).find('td:eq(5)').text();
+                    + "," + $(row).find('td:eq(4)').text() + "," + $(row).find('td:eq(5)').text()
+                    + "," + $(row).find('td:eq(6)').text()  + "," + $(row).find('td:eq(7)').text()
+                 + "," + $(row).find('td:eq(8)').text() + "," + $(row).find('td:eq(9)').text()
+                 + "," + $(row).find('td:eq(10)').text() + "," + $(row).find('td:eq(11)').text()
+                 + "," + $(row).find('td:eq(12)').text() + "," + $(row).find('td:eq(13)').text();
                 csv += "\n"
             });
             // Prompt the user to download the CSV file
             var link = document.createElement('a');
-            link.download = 'markers.csv';
+            link.download = 'markers.txt';
             link.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
             document.body.appendChild(link);
             link.click();
