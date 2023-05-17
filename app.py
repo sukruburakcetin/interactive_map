@@ -1,5 +1,6 @@
 import json
 
+import pandas as pd
 import requests
 from flask import Flask, render_template, request, jsonify
 from shapely import Point
@@ -16,8 +17,8 @@ def index():
 
 @app.route("/save-points", methods=["POST"])
 def save_points():
-    # cnx = cx_Oracle.connect('MAKS_EDU/MXEDU18TT@exa1-scan.ibb.gov.tr:1472/TESTCBS')
-    # cursor = cnx.cursor()
+    cnx = cx_Oracle.connect('MAKS_EDU/MXEDU18TT@exa1-scan.ibb.gov.tr:1472/TESTCBS')
+    cursor = cnx.cursor()
     #
     # sql = '''CREATE TABLE IHE_UYGUNLUK(
     #      LOKASYON CHAR(50),
@@ -39,20 +40,6 @@ def save_points():
     # cnx.commit()
     # cnx.close()
 
-    lokasyon_list = list()
-    enlem_list = list()
-    boylam_list = list()
-    id_list = list()
-    gridcode_list = list()
-    uygunluk_list = list()
-    mahalle_list = list()
-    ilce_list = list()
-    seg_segment_list = list()
-    nufus_list = list()
-    yapi_nufus_list = list()
-    yapi_sayisi_list = list()
-    potansiyel_satis_list = list()
-
     index_no = 0
     # Get the points data from the AJAX request
     points = request.json.get('points')
@@ -65,11 +52,6 @@ def save_points():
     with open('./static/IHE_UYGUNLUK_2.json', 'r',
               encoding='utf-8') as f:
         ihe_uygunluk_geojson = json.load(f)
-
-    # url = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/IHE_UYGUNLUK_2.json'
-    # kres_uygunluk_geojson = requests.get(url).json()
-    # url_mah = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/mahalle_ilce.json'
-    # mahalle_geojson = requests.get(url_mah).json()
 
     with open('./static/ALLFEATURES.json', 'r', encoding='utf-8') as f:
         mahalle_geojson = json.load(f)
@@ -84,17 +66,21 @@ def save_points():
     for k in range(0, len(mahalle_geojson['features'])):
         current_mahalle_geojson = shape(mahalle_geojson['features'][k]['geometry'])
         if point.intersects(current_mahalle_geojson):
-            mah_ad = mahalle_geojson['features'][k]['properties']['MAH_AD']
-            ilce_ad = mahalle_geojson['features'][k]['properties']['ILCE_AD']
-            ses_segment = mahalle_geojson['features'][k]['properties']['SES_SEGMENT']
-            nufus = mahalle_geojson['features'][k]['properties']['NUFUS']
-            yapi_nufus = mahalle_geojson['features'][k]['properties']['YAPI_NUFUS']
-            yapi_sayisi = mahalle_geojson['features'][k]['properties']['YAPI_SAYISI']
-
-
-
-        # print("mah_ad: ", mah_ad)
-    # print("ilce_ad: ", ilce_ad)
+            try:
+                mah_ad = mahalle_geojson['features'][k]['properties']['MAH_AD']
+                ilce_ad = mahalle_geojson['features'][k]['properties']['ILCE_AD']
+                ses_segment = mahalle_geojson['features'][k]['properties']['SES_SEGMENT']
+                nufus = mahalle_geojson['features'][k]['properties']['NUFUS']
+                yapi_nufus = mahalle_geojson['features'][k]['properties']['YAPI_NUFUS']
+                yapi_sayisi = mahalle_geojson['features'][k]['properties']['YAPI_SAYISI']
+                break
+            except:
+                mah_ad = "Özel Bölge(Mah. bilgisi yok)"
+                ilce_ad = "Özel Bölge(İlçe bilgisi yok)"
+                ses_segment = "Özel Bölge(SES bilgisi yok)"
+                nufus = 0
+                yapi_nufus = 0
+                yapi_sayisi = 0
 
     # Find all the shapes that intersect with the polygon
     intersecting_shapes = []
@@ -160,7 +146,7 @@ def save_points():
                 'type': 'Polygon',
                 'coordinates': [list(polygon.exterior.coords)]
             },
-            'id': 0,
+            'id': " ",
             'gridcode': final_suitability_value,
             'suitability': suitability,
             'mahalle_ad': mah_ad,
@@ -171,6 +157,65 @@ def save_points():
             'yapi_sayisi': yapi_sayisi,
             'potansiyel_satis': ""
         }
+
+        lokasyon_list = list()
+        enlem_list = list()
+        boylam_list = list()
+        id_list = list()
+        gridcode_list = list()
+        uygunluk_list = list()
+        mahalle_list = list()
+        ilce_list = list()
+        seg_segment_list = list()
+        nufus_list = list()
+        yapi_nufus_list = list()
+        yapi_sayisi_list = list()
+        potansiyel_satis_list = list()
+
+        lokasyon_list.append("")
+        enlem_list.append(points['geometry']['coordinates'][0])
+        boylam_list.append(points['geometry']['coordinates'][1])
+        id_list.append("")
+        gridcode_list.append(final_suitability_value)
+        uygunluk_list.append(suitability)
+        mahalle_list.append(mah_ad)
+        ilce_list.append(ilce_ad)
+        seg_segment_list.append(ses_segment)
+        nufus_list.append(nufus)
+        yapi_nufus_list.append(yapi_nufus)
+        yapi_sayisi_list.append(yapi_sayisi)
+        potansiyel_satis_list.append("")
+
+        df = pd.DataFrame({"LOKASYON": lokasyon_list, "ENLEM": enlem_list, "BOYLAM": boylam_list,
+                           "ID": id_list, "GRIDCODE": gridcode_list, "UYGUNLUK": uygunluk_list,
+                           "MAHALLE": mahalle_list, "ILCE": ilce_list, "SES_SEGMENT": seg_segment_list,
+                           "NUFUS": nufus_list, "YAPI_NUFUS": yapi_nufus_list, "YAPI_SAYISI": yapi_sayisi_list,
+                           "POTANSIYEL_SATIS": potansiyel_satis_list})
+
+        df_tuples = [tuple(x) for x in df.values]
+        """veritabanina yazdirma"""
+        sqlTxt = 'INSERT INTO "MAKS_EDU".IHE_UYGUNLUK\
+                        (LOKASYON, ENLEM, BOYLAM, ID, GRIDCODE, UYGUNLUK, MAHALLE, ILCE, SES_SEGMENT, ' \
+                 'NUFUS, YAPI_NUFUS, YAPI_SAYISI, POTANSIYEL_SATIS )\
+                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13)'
+
+        cursor.executemany(sqlTxt, df_tuples)
+        cnx.commit()
+        """stack sismesin diye hafiza kontrolu yapilir"""
+        lokasyon_list.clear()
+        enlem_list.clear()
+        boylam_list.clear()
+        id_list.clear()
+        gridcode_list.clear()
+        uygunluk_list.clear()
+        mahalle_list.clear()
+        ilce_list.clear()
+        seg_segment_list.clear()
+        nufus_list.clear()
+        yapi_nufus_list.clear()
+        yapi_sayisi_list.clear()
+        potansiyel_satis_list.clear()
+
         intersecting_shapes.clear()
         intersecting_shapes_indexes.clear()
         suitability_values.clear()
@@ -207,6 +252,7 @@ def save_points():
                     'yapi_sayisi': yapi_sayisi,
                     'potansiyel_satis': ""
                 }
+                break
         if thereIsAPolygon == 0:
             feature = {
                 'type': 'Feature',
@@ -225,6 +271,64 @@ def save_points():
                 'yapi_sayisi': " ",
                 'potansiyel_satis': ""
             }
+
+        lokasyon_list = list()
+        enlem_list = list()
+        boylam_list = list()
+        id_list = list()
+        gridcode_list = list()
+        uygunluk_list = list()
+        mahalle_list = list()
+        ilce_list = list()
+        seg_segment_list = list()
+        nufus_list = list()
+        yapi_nufus_list = list()
+        yapi_sayisi_list = list()
+        potansiyel_satis_list = list()
+
+        lokasyon_list.append("")
+        enlem_list.append(points['geometry']['coordinates'][0])
+        boylam_list.append(points['geometry']['coordinates'][1])
+        id_list.append(ihe_uygunluk_geojson['features'][i]['properties']['Id'])
+        gridcode_list.append(ihe_uygunluk_geojson['features'][i]['properties']['gridcode'])
+        uygunluk_list.append(suitability_condition[0])
+        mahalle_list.append(mah_ad)
+        ilce_list.append(ilce_ad)
+        seg_segment_list.append(ses_segment)
+        nufus_list.append(nufus)
+        yapi_nufus_list.append(yapi_nufus)
+        yapi_sayisi_list.append(yapi_sayisi)
+        potansiyel_satis_list.append("")
+
+        df = pd.DataFrame({"LOKASYON": lokasyon_list, "ENLEM": enlem_list, "BOYLAM": boylam_list,
+                           "ID": id_list, "GRIDCODE": gridcode_list, "UYGUNLUK": uygunluk_list,
+                           "MAHALLE": mahalle_list, "ILCE": ilce_list, "SES_SEGMENT": seg_segment_list,
+                           "NUFUS": nufus_list, "YAPI_NUFUS": yapi_nufus_list, "YAPI_SAYISI": yapi_sayisi_list,
+                           "POTANSIYEL_SATIS": potansiyel_satis_list})
+
+        df_tuples = [tuple(x) for x in df.values]
+        """veritabanina yazdirma"""
+        sqlTxt = 'INSERT INTO "MAKS_EDU".IHE_UYGUNLUK\
+                        (LOKASYON, ENLEM, BOYLAM, ID, GRIDCODE, UYGUNLUK, MAHALLE, ILCE, SES_SEGMENT, ' \
+                 'NUFUS, YAPI_NUFUS, YAPI_SAYISI, POTANSIYEL_SATIS )\
+                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13)'
+
+        cursor.executemany(sqlTxt, df_tuples)
+        cnx.commit()
+        """stack sismesin diye hafiza kontrolu yapilir"""
+        lokasyon_list.clear()
+        enlem_list.clear()
+        boylam_list.clear()
+        id_list.clear()
+        gridcode_list.clear()
+        uygunluk_list.clear()
+        mahalle_list.clear()
+        ilce_list.clear()
+        seg_segment_list.clear()
+        nufus_list.clear()
+        yapi_nufus_list.clear()
+        yapi_sayisi_list.clear()
+        potansiyel_satis_list.clear()
         # Return the GeoJSON Feature object as a JSON response
     return jsonify(feature)
 
