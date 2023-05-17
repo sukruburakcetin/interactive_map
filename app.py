@@ -4,6 +4,7 @@ import requests
 from flask import Flask, render_template, request, jsonify
 from shapely import Point
 from shapely.geometry import shape
+import cx_Oracle
 
 app = Flask(__name__)
 
@@ -15,6 +16,29 @@ def index():
 
 @app.route("/save-points", methods=["POST"])
 def save_points():
+    # cnx = cx_Oracle.connect('MAKS_EDU/MXEDU18TT@exa1-scan.ibb.gov.tr:1472/TESTCBS')
+    # cursor = cnx.cursor()
+    #
+    # sql = '''CREATE TABLE IHE_UYGUNLUK(
+    #      LOKASYON CHAR(50),
+    #      ENLEM FLOAT,
+    #      BOYLAM FLOAT,
+    #      ID INT,
+    #      GRIDCODE FLOAT,
+    #      UYGUNLUK CHAR(50),
+    #      MAHALLE CHAR(50),
+    #      ILCE CHAR(50),
+    #      SES_SEGMENT CHAR(50),
+    #      NUFUS INT,
+    #      YAPI_NUFUS INT,
+    #      YAPI_SAYISI INT,
+    #      POTANSIYEL_SATIS FLOAT
+    # )'''
+    #
+    # cursor.execute(sql)
+    # cnx.commit()
+    # cnx.close()
+
     index_no = 0
     # Get the points data from the AJAX request
     points = request.json.get('points')
@@ -130,7 +154,8 @@ def save_points():
             'ses_segment': ses_segment,
             'nufus': nufus,
             'yapi_nufus': yapi_nufus,
-            'yapi_sayisi': yapi_sayisi
+            'yapi_sayisi': yapi_sayisi,
+            'potansiyel_satis': ""
         }
         intersecting_shapes.clear()
         intersecting_shapes_indexes.clear()
@@ -165,7 +190,8 @@ def save_points():
                     'ses_segment': ses_segment,
                     'nufus': nufus,
                     'yapi_nufus': yapi_nufus,
-                    'yapi_sayisi': yapi_sayisi
+                    'yapi_sayisi': yapi_sayisi,
+                    'potansiyel_satis': ""
                 }
         if thereIsAPolygon == 0:
             feature = {
@@ -182,7 +208,8 @@ def save_points():
                 'ses_segment': " ",
                 'nufus': " ",
                 'yapi_nufus': " ",
-                'yapi_sayisi': " "
+                'yapi_sayisi': " ",
+                'potansiyel_satis': ""
             }
         # Return the GeoJSON Feature object as a JSON response
     return jsonify(feature)

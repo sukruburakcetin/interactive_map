@@ -980,9 +980,22 @@
                       $('#marker-table tbody').append(newRow);
 
                         // Add the properties to the marker popup
-                        layer.bindPopup('Location: ' + locationValue + '<br>Latitude: ' + latlng.lat.toFixed(6) +
-                            '<br>Longitude: ' + latlng.lng.toFixed(6) + '<br>ID: ' + response['id'] + '<br>GRIDCODE: '
-                            + response['gridcode'] + '<br>SUITABILITY: '+ response['suitability'] + '<br>Neighboorhood: '+ response['mahalle_ad'] + '<br>ilce_ad: '+ response['ilce_ad'] + '<br>ses_segment: '+ response['ses_segment'] + '<br>nufus: '+ response['nufus'] + '<br>yapi_nufus: '+ response['yapi_nufus'] + '<br>yapi_sayisi: '+ response['yapi_sayisi'] + '<br><a href="https://www.google.com/maps?layer=c&cbll=' + String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
+                        layer.bindPopup(
+                            '<b>Lokasyon:</b> ' + locationValue +
+                            '<br><b>Enlem:</b> ' + latlng.lat.toFixed(6) +
+                            '<br><b>Boylam:</b> ' + latlng.lng.toFixed(6) +
+                            '<br><b>Id:</b> ' + response['id'] +
+                            '<br><b>Gridcode:</b> ' + response['gridcode'] +
+                            '<br><b>Uygunluk:</b> '+ response['suitability'] +
+                            '<br><b>Mahalle:</b> '+ response['mahalle_ad'] +
+                            '<br><b>İlçe:</b> '+ response['ilce_ad'] +
+                            '<br><b>Ses Segment:</b> '+ response['ses_segment'] +
+                            '<br><b>Nüfus:</b> '+ response['nufus'] +
+                            '<br><b>Yapi Nüfus:</b> '+ response['yapi_nufus'] +
+                            '<br><b>Yapı Sayısı:</b> '+ response['yapi_sayisi'] +
+                            '<br><b>Potansiyel Satış:</b> '+ response['potansiyel_satis'] +
+                            '<br><a href="https://www.google.com/maps?layer=c&cbll=' +
+                            String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
                         gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                         locationValuesList.push(parseFloat(gridcodeValue));
                     },
