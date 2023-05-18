@@ -93,6 +93,30 @@
         background-color: #eee;
       }
 
+      .items {
+
+          display: inline-block;
+          font-size: 14px;
+          border: 1px solid black;
+          padding: 2px 5px;
+          margin-right: 5px;
+      }
+
+      .popup-tile{
+        font-size:18px;
+      }
+
+      .popup-description{
+        font-size:16px;
+          text-align: justify;
+
+      }
+      .created-by{
+          font-size:14px;
+          text-align:center;
+      }
+
+
 
       #marker-table {
           position: absolute;
@@ -134,27 +158,6 @@
           border-radius: 5px;
       }
 
-      .items{
-          display: inline-block;
-          font-size:14px;
-          border: 1px solid black;
-          padding: 2px 5px;
-          margin-right: 5px;
-      }
-
-      .popup-tile{
-        font-size:18px;
-      }
-
-      .popup-description{
-        font-size:16px;
-          text-align: justify;
-
-      }
-      .created-by{
-          font-size:14px;
-          text-align:center;
-      }
 
       #menu {
           position: absolute;
@@ -485,27 +488,42 @@
             subdomains: ['a', 'b', 'c']
         })
 
-        var rehberVTLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/Rehber/MapServer/tile/{z}/{y}/{x}', {
+        var rehberVTGrayLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/RehberGrayMap/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'İstanbul Büyükşehir Belediyesi©',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 19
+        });
+
+        var rehberVTDarkLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/RehberDark/MapServer/tile/{z}/{y}/{x}', {
             attribution: 'İstanbul Büyükşehir Belediyesi©',
             subdomains: 'abcd',
             minZoom: 0,
             maxZoom: 19
         })
+        var uyduLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/Uydu/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'İstanbul Büyükşehir Belediyesi©',
+            subdomains: 'abcd',
+            minZoom: 0,
+            maxZoom: 19
+        });
 
 
         // Add only the selected layer back to the map
-        var selectedLayer = rehberVTLayer
+        var selectedLayer = rehberVTGrayLayer
         selectedLayer.addTo(map);
 
         // Add the layer control back to the map with only the selected layer option
         var layerControl = L.control.layers({
             // Only show the selected layer in the layer control
-            'RehberVT': rehberVTLayer,
-            'Mapbox': selectedLayer,
+            'RehberVTGray': selectedLayer,
+            'RehberVTDark': rehberVTDarkLayer,
+            'Uydu 2022': uyduLayer,
+            'Mapbox': mapboxStreets,
             'Carto': cartoPositron,
             'OpenTopo': openTopoMap,
             'Esri': esriLayer,
-            'Osm': osmLayer,
+            'Osm': osmLayer
         }).addTo(map);
 
         // define the suitabilityLayer variable outside of the callback function
