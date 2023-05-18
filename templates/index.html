@@ -109,22 +109,21 @@
           border-radius: 5px;
       }
 
-        #marker-table tbody tr:nth-child(odd) {
-            background-color: #c9c9d2;
-        }
+      #marker-table tbody tr:nth-child(odd) {
+          background-color: #c9c9d2;
+      }
+
       #marker-table thead tr {
             background-color: #eeeef3;
-        }
+      }
 
       #marker-table tbody tr:nth-child(even) {
             background-color: #929298;
       }
 
-
-
       #marker-table.show {
-        display: table; /* show the table when the "show" class is added */
-                    max-height: 250px; /* Set a maximum height for the container */
+          display: table; /* show the table when the "show" class is added */
+          max-height: 250px; /* Set a maximum height for the container */
           overflow-y: auto; /* Enable vertical scroll when content exceeds the container's height */
       }
 
@@ -360,7 +359,7 @@
                 <ion-icon name="arrow-back"></ion-icon>
             </button>
             <button id="delete-selected-feature">
-                <ion-icon name="close"></ion-icon>
+                <ion-icon id ="delete-selected-feature-icon" name="close"></ion-icon>
             </button>
             <button id="save-features">
                 <ion-icon name="save"></ion-icon>
@@ -422,11 +421,9 @@
 
         function scrollMenu(){
             if (checker % 2 == 0){
-                console.log('1')
                 btnContainer.style.left = "1px";
                 checker += 1
             } else{
-                console.log('2')
                 btnContainer.style.left = "-50px";
                 checker += 1
             }
@@ -488,30 +485,27 @@
             subdomains: ['a', 'b', 'c']
         })
 
-        var stamenTerrain = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.png', {
-            attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, ' +
-                '<a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; ' +
-                'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
-                '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>',
+        var rehberVTLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/Rehber/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'İstanbul Büyükşehir Belediyesi©',
             subdomains: 'abcd',
             minZoom: 0,
-            maxZoom: 18
+            maxZoom: 19
         })
 
 
         // Add only the selected layer back to the map
-        var selectedLayer = mapboxStreets
+        var selectedLayer = rehberVTLayer
         selectedLayer.addTo(map);
 
         // Add the layer control back to the map with only the selected layer option
         var layerControl = L.control.layers({
             // Only show the selected layer in the layer control
+            'RehberVT': rehberVTLayer,
             'Mapbox': selectedLayer,
-            'Stamen': stamenTerrain,
             'Carto': cartoPositron,
             'OpenTopo': openTopoMap,
             'Esri': esriLayer,
-            'Osm': osmLayer
+            'Osm': osmLayer,
         }).addTo(map);
 
         // define the suitabilityLayer variable outside of the callback function
@@ -612,8 +606,6 @@
               else if (gridcode === 5){
                   fillColor = '#54278f';
               }
-
-
                 return {
                 color: '#000',
                 weight: 2,
@@ -1073,7 +1065,36 @@
                             String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
                         gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                         locationValuesList.push(parseFloat(gridcodeValue));
-                        console.log("eren mert mokoko:", locationValuesList)
+                        var els = document.getElementById("marker-table").getElementsByTagName("tr");
+
+                        drawnItems.getLayers().forEach(function(marker) {
+                            marker.on('click', function(event) {
+                                current_lat = marker._latlng.lat.toFixed(6)
+                                current_lng = marker._latlng.lng.toFixed(6)
+                                $('#marker-table tbody tr').each(function(index, row) {
+                                    index +=  1
+
+                                    if (current_lat ===   $(row).find('td:eq(2)').text() && current_lng ===  $(row).find('td:eq(3)').text())
+                                    {
+                                        for (var i = 0; i <= drawnItems.getLayers().length; i++) {
+                                            if(i === index){
+                                                els[index].style.background = "red";
+                                            }
+                                            else{
+                                                if(i%2 === 0) {
+
+                                                    els[i].style.background = "#929298";
+                                                }
+                                                else if(i%2 === 1){
+                                                    els[i].style.background = "#c9c9d2";
+                                                }
+                                            }
+                                        }
+                                    }
+                                })
+
+                            });
+                         });
                     },
                     error: function(error) {
                         console.log("fail_return_log", error);
@@ -1096,7 +1117,7 @@
 
                 // Create the button
                 var button = L.DomUtil.create('button', 'compare-button');
-                button.innerHTML = 'Compare Markers';
+                button.innerHTML = 'Karşılaştır';
                 L.DomEvent.on(button, 'click', this._onClick, this);
 
                 // Add the custom CSS style
@@ -1158,14 +1179,18 @@
                           }
                       });
               }
-                  else{
+                  else if(highestValue ===0) {
                       alert("Uygun alan yok!");
                   }
+                  else
+                  {
+                      alert("İşaretçiler sınır dışında!")
+                  }
+
               }
             });
             map.addControl(new compareButton());
             drawnItems.addLayer(layer);
-            // console.log(drawnItems.toGeoJSON());
         });
 
         var deleteLastFeatureButton = document.getElementById('delete-last-feature');
@@ -1185,48 +1210,62 @@
 
         });
 
-        var deleteSelectedFeaturebutton = document.getElementById('delete-selected-feature');
 
+
+        var isClickManageActive = false;
+        var deleteSelectedFeatureButton = document.getElementById('delete-selected-feature');
+        var saveIcon = document.getElementById('delete-selected-feature-icon');
+        checkerDeleteSelectedFeature = 0;
                 // Add a click event listener to the button
-        deleteSelectedFeaturebutton.addEventListener('click', function() {
-
-                        // Add markers to the map
-            drawnItems.getLayers().forEach(function(marker) {
-
-                // Attach a click event listener to each marker
-                marker.on('click', function(event) {
-                    console.log('Marker clicked!');
-
-                    console.log(marker._latlng)
-                    for (var i=0; i < drawnItems.getLayers().length; i++)
-                    {
-                        console.log(drawnItems.getLayers()[i]._latlng)
-                        if (marker._latlng === drawnItems.getLayers()[i]._latlng)
-                        {
-                            // Perform any desired actions when a marker is clicked
-                            var currentMarker = drawnItems.getLayers()[i]
-                            var selectedMarkerOfLayer =addedLayers.splice(i, 1)[0];
-                             drawnItems.removeLayer(currentMarker);
-                             map.removeLayer(selectedMarkerOfLayer)
-                             locationValuesList.splice(i, 1);
-                            console.log("eren mert mokoko after:", locationValuesList)
-                             var tableBody = document.querySelector("#marker-table tbody");
-                            var rows = tableBody.getElementsByTagName("tr");
-
-                            if (i >= 0 && i < rows.length) {
-                              var rowToRemove = rows[i];
-                              rowToRemove.remove();
-                            }
-
-                        }
-                    }
-
-                });
-            });
-
-
+        deleteSelectedFeatureButton.addEventListener('click', function() {
+            checkerDeleteSelectedFeature += 1
+            if(checkerDeleteSelectedFeature%2===1){
+                clickManage()
+            }
+            else{
+                isClickManageActive = false;
+                deleteSelectedFeatureButton.style.backgroundColor = "#fbf7f7";
+                deleteSelectedFeatureButton.style.fontSize = "18px";
+                saveIcon.style.color = "black";
+            }
         });
 
+        function clickManage() {
+            isClickManageActive = true;
+            deleteSelectedFeatureButton.style.backgroundColor = "gray";
+            deleteSelectedFeatureButton.style.fontSize = "20px";
+            saveIcon.style.color = "#fbf7f7";
+            // Add markers to the map
+            drawnItems.getLayers().forEach(function (marker) {
+                // Attach a click event listener to each marker
+                marker.on('click', function (event) {
+                    if (isClickManageActive) {
+                        for (var i = 0; i < drawnItems.getLayers().length; i++) {
+                            console.log(drawnItems.getLayers()[i]._latlng)
+                            if (marker._latlng === drawnItems.getLayers()[i]._latlng) {
+                                // Perform any desired actions when a marker is clicked
+                                var currentMarker = drawnItems.getLayers()[i]
+                                var selectedMarkerOfLayer = addedLayers.splice(i, 1)[0];
+                                drawnItems.removeLayer(currentMarker);
+                                map.removeLayer(selectedMarkerOfLayer)
+                                locationValuesList.splice(i, 1);
+                                var tableBody = document.querySelector("#marker-table tbody");
+                                var rows = tableBody.getElementsByTagName("tr");
+
+                                if (i >= 0 && i < rows.length) {
+                                    var rowToRemove = rows[i];
+                                    rowToRemove.remove();
+                                }
+                            }
+                        }
+                    } else {
+                        console.log("button is deactivated")
+                    }
+                });
+
+            });
+
+        }
         // Get the "Delete All Layers" button element
         var deleteButton = document.getElementById('delete-features');
 
@@ -1251,10 +1290,10 @@
                 csv += $(row).find('td:first').text() + "," + $(row).find('td:eq(1)').text() + ","
                     + $(row).find('td:eq(2)').text() + "," + $(row).find('td:eq(3)').text()
                     + "," + $(row).find('td:eq(4)').text() + "," + $(row).find('td:eq(5)').text()
-                    + "," + $(row).find('td:eq(6)').text()  + "," + $(row).find('td:eq(7)').text()
-                 + "," + $(row).find('td:eq(8)').text() + "," + $(row).find('td:eq(9)').text()
-                 + "," + $(row).find('td:eq(10)').text() + "," + $(row).find('td:eq(11)').text()
-                 + "," + $(row).find('td:eq(12)').text() + "," + $(row).find('td:eq(13)').text();
+                    + "," + $(row).find('td:eq(6)').text() + "," + $(row).find('td:eq(7)').text()
+                    + "," + $(row).find('td:eq(8)').text() + "," + $(row).find('td:eq(9)').text()
+                    + "," + $(row).find('td:eq(10)').text() + "," + $(row).find('td:eq(11)').text()
+                    + "," + $(row).find('td:eq(12)').text() + "," + $(row).find('td:eq(13)').text()
                 csv += "\n"
             });
             // Prompt the user to download the CSV file
@@ -1265,7 +1304,7 @@
             link.click();
             document.body.removeChild(link);
         }
-        document.getElementById("save-features").addEventListener("click", saveData);
+        var saveFeaturesButton = document.getElementById("save-features").addEventListener("click", saveData);
     </script>
 </body>
 </html>

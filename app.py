@@ -66,13 +66,31 @@ def save_points():
         current_mahalle_geojson = shape(mahalle_geojson['features'][k]['geometry'])
         if point.intersects(current_mahalle_geojson):
             try:
-                mah_ad = mahalle_geojson['features'][k]['properties']['MAH_AD']
-                ilce_ad = mahalle_geojson['features'][k]['properties']['ILCE_AD']
-                ses_segment = mahalle_geojson['features'][k]['properties']['SES_SEGMENT']
-                nufus = mahalle_geojson['features'][k]['properties']['NUFUS']
-                yapi_nufus = mahalle_geojson['features'][k]['properties']['YAPI_NUFUS']
-                yapi_sayisi = mahalle_geojson['features'][k]['properties']['YAPI_SAYISI']
-                break
+                try:
+                    mah_ad = mahalle_geojson['features'][k]['properties']['MAH_AD']
+                except:
+                    pass
+                try:
+                    ilce_ad = mahalle_geojson['features'][k]['properties']['ILCE_AD']
+                except:
+                    pass
+                try:
+                    ses_segment = mahalle_geojson['features'][k]['properties']['SES_SEGMENT']
+                except:
+                    pass
+                try:
+                    nufus = mahalle_geojson['features'][k]['properties']['NUFUS']
+                except:
+                    pass
+                try:
+                    yapi_nufus = mahalle_geojson['features'][k]['properties']['YAPI_NUFUS']
+                except:
+                    pass
+                try:
+                    yapi_sayisi = mahalle_geojson['features'][k]['properties']['YAPI_SAYISI']
+                except:
+                    pass
+                    break
             except:
                 mah_ad = "Özel Bölge(Mah. bilgisi yok)"
                 ilce_ad = "Özel Bölge(İlçe bilgisi yok)"
@@ -299,7 +317,10 @@ def save_points():
         boylam_list.append(points['geometry']['coordinates'][1])
         id_list.append(ihe_uygunluk_geojson['features'][i]['properties']['Id'])
         gridcode_list.append(ihe_uygunluk_geojson['features'][i]['properties']['gridcode'])
-        uygunluk_list.append(suitability_condition[0])
+        try:
+            uygunluk_list.append(suitability_condition[0])
+        except:
+            uygunluk_list.append(" ")
         mahalle_list.append(mah_ad)
         ilce_list.append(ilce_ad)
         seg_segment_list.append(ses_segment)
