@@ -52,7 +52,7 @@ def save_points():
               encoding='utf-8') as f:
         ihe_uygunluk_geojson = json.load(f)
 
-    with open('./static/ALLFEATURES.json', 'r', encoding='utf-8') as f:
+    with open('./static/ALLFEATURES_NEW.geojson', 'r', encoding='utf-8') as f:
         mahalle_geojson = json.load(f)
 
     mah_ad = ""
@@ -61,6 +61,7 @@ def save_points():
     ses_segment = ""
     yapi_nufus = ""
     yapi_sayisi = ""
+    potansiyel_satis = ""
 
     for k in range(0, len(mahalle_geojson['features'])):
         current_mahalle_geojson = shape(mahalle_geojson['features'][k]['geometry'])
@@ -88,6 +89,10 @@ def save_points():
                     pass
                 try:
                     yapi_sayisi = mahalle_geojson['features'][k]['properties']['YAPI_SAYISI']
+                except:
+                    pass
+                try:
+                    potansiyel_satis = mahalle_geojson['features'][k]['properties']['POTANSIYEL_SATIS']
                 except:
                     pass
                     break
@@ -181,7 +186,7 @@ def save_points():
             'nufus': nufus,
             'yapi_nufus': yapi_nufus,
             'yapi_sayisi': yapi_sayisi,
-            'potansiyel_satis': ""
+            'potansiyel_satis': potansiyel_satis
         }
 
         lokasyon_list = list()
@@ -276,7 +281,7 @@ def save_points():
                     'nufus': nufus,
                     'yapi_nufus': yapi_nufus,
                     'yapi_sayisi': yapi_sayisi,
-                    'potansiyel_satis': ""
+                    'potansiyel_satis': potansiyel_satis
                 }
                 break
         if thereIsAPolygon == 0:
