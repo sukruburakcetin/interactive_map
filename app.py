@@ -13,6 +13,20 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+@app.route("/locate-addresses", methods=["POST"])
+def locate_addresses():
+    import requests
+
+    api_url = 'http://10.6.128.105:7000/address_geocode/'
+
+    search_param = {'search': ""}
+    search_param.update({'search': request.json.get("search-bar-input")})
+    if len(search_param['search']) > 0:
+        data_geocoding_result = requests.get(url=api_url, params=search_param).json()
+        return jsonify(data_geocoding_result)
+    else:
+        return jsonify({"message":"address is not available"})
+
 
 @app.route("/save-points", methods=["POST"])
 def save_points():
@@ -48,7 +62,7 @@ def save_points():
     # Create a buffer around the Point object with a radius of 20 meters
     polygon = point.buffer(0.0002)  # 0.0002 is roughly equivalent to 20 meters
 
-    with open('./static/IHE_UYGUNLUK_2.json', 'r',
+    with open('./static/IHE_UYGUNLUK_YENI.geojson', 'r',
               encoding='utf-8') as f:
         ihe_uygunluk_geojson = json.load(f)
 
@@ -111,7 +125,13 @@ def save_points():
     for i in range(0, len(ihe_uygunluk_geojson['features'])):
         current_ihe_uygunluk_shape = shape(ihe_uygunluk_geojson['features'][i]['geometry'])
         if point.intersects(current_ihe_uygunluk_shape) and \
-                ihe_uygunluk_geojson['features'][i]['properties']['gridcode'] == 0:
+                ihe_uygunluk_geojson['features'][i]['properties']['GRIDCODE'] == 6:
+            break
+        if point.intersects(current_ihe_uygunluk_shape) and \
+                ihe_uygunluk_geojson['features'][i]['properties']['GRIDCODE'] == 7:
+            break
+        if point.intersects(current_ihe_uygunluk_shape) and \
+                ihe_uygunluk_geojson['features'][i]['properties']['GRIDCODE'] == 8:
             break
         if polygon.intersects(current_ihe_uygunluk_shape):
             intersecting_shapes.append(current_ihe_uygunluk_shape)
@@ -129,7 +149,7 @@ def save_points():
             # print("proportion within shape: ", current_ihe_uygunluk_shape)
             suitability_values.append({
                 'gridcode': ihe_uygunluk_geojson['features'][intersecting_shapes_indexes[index_no]]['properties'][
-                    'gridcode'],
+                    'GRIDCODE'],
                 'proportion_within_shape': proportion_within_shape  # burada proporsiyonu saklıyorum
             })
             index_no += 1
@@ -157,18 +177,19 @@ def save_points():
         suitability = ""
         # sonra burada toplatılmıs value'ye göre tekrardan uygunluk description ataması yapıyorum
         final_suitability_value = sum([value['weighted_suitability'] for value in weighted_suitability_values])
-        if 3 < final_suitability_value < 4:  # misal bizim GRIDCODE: 2.5532738460809687 degeri
+        if 4 < final_suitability_value < 5:  # misal bizim GRIDCODE: 2.5532738460809687 degeri
             # bu aralıkta o yüzden uygun - az uygun
-            suitability = "Uygun"
-        elif 2 < final_suitability_value < 3:  # misal bizim GRIDCODE: 2.5532738460809687 degeri bu
+            suitability = "Daha Uygun-En Uygun"
+        elif 3 < final_suitability_value < 4:  # misal bizim GRIDCODE: 2.5532738460809687 degeri bu
             # aralıkta o yüzden uygun - az uygun
-            suitability = "Uygun - Az Uygun"
+            suitability = "Uygun-Daha Uygun"
+
+        elif 2 < final_suitability_value < 3:
+            suitability = "Az Uygun-Uygun"
 
         elif 1 < final_suitability_value < 2:
-            suitability = "Az Uygun - Uygun Değil"
+            suitability = "Uygun Değil-Az Uygun"
 
-        elif 0 < final_suitability_value < 1:
-            suitability = "Uygun Değil"
 
         # sonra bu degeri marker'a bind edip html tarafında ajax koduyla bu veriyi consume edip ekrana yansıtıyorum
         feature = {
@@ -253,17 +274,29 @@ def save_points():
         weighted_suitability_values.clear()
 
     else:
-
         thereIsAPolygon = 0
         for i in range(0, len(ihe_uygunluk_geojson['features'])):
             current_ihe_uygunluk_shape = shape(ihe_uygunluk_geojson['features'][i]['geometry'])
             if polygon.within(current_ihe_uygunluk_shape):
                 thereIsAPolygon = 1
-                # print(kres_uygunluk_geojson['features'][i]['properties']['Id'])
-                # print(kres_uygunluk_geojson['features'][i]['properties']['gridcode'])
-                suitability_condition = ["Konum atilamaz" if gridcode == "0" else "Uygun Degil" if gridcode == "1"
-                else "Az Uygun" if gridcode == "2" else "Uygun" if gridcode == "3" else "Çok Uygun" for gridcode
-                                         in str(ihe_uygunluk_geojson['features'][i]['properties']['gridcode'])]
+                current_gridcode = ihe_uygunluk_geojson['features'][i]['properties']['GRIDCODE']
+
+                if current_gridcode == 1:
+                    suitability_condition = "Uygun Degil"
+                elif current_gridcode == 2:
+                    suitability_condition = "Az Uygun"
+                elif current_gridcode == 3:
+                    suitability_condition = "Uygun"
+                elif current_gridcode == 4:
+                    suitability_condition = "Daha Uygun"
+                elif current_gridcode == 5:
+                    suitability_condition = "En Uygun"
+                elif current_gridcode == 6:
+                    suitability_condition = "Sulak Alan"
+                elif current_gridcode == 7:
+                    suitability_condition = "Askeri Bölge"
+                elif current_gridcode == 8:
+                    suitability_condition = "Ormanlık Alan"
 
                 # Convert the Shapely Polygon object to a GeoJSON Feature object
                 feature = {
@@ -272,8 +305,8 @@ def save_points():
                         'type': 'Polygon',
                         'coordinates': [list(polygon.exterior.coords)]
                     },
-                    'id': ihe_uygunluk_geojson['features'][i]['properties']['Id'],
-                    'gridcode': ihe_uygunluk_geojson['features'][i]['properties']['gridcode'],
+                    'id': ihe_uygunluk_geojson['features'][i]['properties']['OBJECTID'],
+                    'gridcode': ihe_uygunluk_geojson['features'][i]['properties']['GRIDCODE'],
                     'suitability': suitability_condition,
                     'mahalle_ad': mah_ad,
                     'ilce_ad': ilce_ad,
@@ -320,8 +353,8 @@ def save_points():
         lokasyon_list.append("")
         enlem_list.append(points['geometry']['coordinates'][0])
         boylam_list.append(points['geometry']['coordinates'][1])
-        id_list.append(ihe_uygunluk_geojson['features'][i]['properties']['Id'])
-        gridcode_list.append(ihe_uygunluk_geojson['features'][i]['properties']['gridcode'])
+        id_list.append(ihe_uygunluk_geojson['features'][i]['properties']['OBJECTID'])
+        gridcode_list.append(ihe_uygunluk_geojson['features'][i]['properties']['GRIDCODE'])
         try:
             uygunluk_list.append(suitability_condition[0])
         except:

@@ -45,3 +45,9 @@
 #
 # if __name__ == "__main__":
 #     app.run(debug=True)
+
+
+# url = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/IHE_UYGUNLUK_2.json'
+# kres_uygunluk_geojson = requests.get(url).json()
+# url_mah = 'https://raw.githubusercontent.com/sukruburakcetin/interactive_map/main/static/mahalle_ilce.json'
+# mahalle_geojson = requests.get(url_mah).json()

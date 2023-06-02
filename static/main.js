@@ -3,26 +3,102 @@ var menuBtn = document.getElementById('menu')
 var darkScreen = document.getElementById('dark-screen')
 
 var addInput = document.getElementById('add-input')
-let checker = 0;
+
 menuBtn.addEventListener('click', scrollMenu)
+
+var preLoader = document.getElementById("pre-loader")
+
+preLoader.style.animation = "flip-horizontal 1s ease-in-out infinite";
 
 var buttonContainerFirst = document.getElementById('button-container-first')
 var buttonContainerSecond = document.getElementById('button-container-second')
 var buttonContainerThird = document.getElementById('button-container-third')
+var buttonClearAddress = document.getElementById('clear-address')
+var searchInput = document.getElementById('search-bar-input')
 
-function scrollMenu() {
-    if (checker % 2 == 0) {
-        buttonContainerFirst.style.left = "1px";
-        buttonContainerThird.style.left = "1px";
-        checker += 1
-    } else {
-        buttonContainerFirst.style.left = "-50px";
-        buttonContainerSecond.style.left = "-50px"
-        buttonContainerThird.style.left = "-50px";
-        checker += 1
+var resultContainer = document.getElementById('result-container');
+
+var potentialSaleInfo = document.getElementById('#potential-sale-info')
+searchInput.addEventListener('click', function (){
+    resultContainer.style.display = 'block'
+})
+
+function submitForm(event) {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    var searchInput = document.getElementById('search-bar-input').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/locate-addresses", true);
+    xhr.setRequestHeader("Content-Type", "application/json");
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            var response = JSON.parse(xhr.responseText);
+            // Handle the response here
+            console.log(response);
+            displayResponse(response);
+        }
+    };
+
+    var data = JSON.stringify({"search-bar-input": searchInput});
+    // console.log("data", data)
+    xhr.send(data);
+
+    function displayResponse(response) {
+        // var resultContainer = document.getElementById('result-container');
+        resultContainer.innerHTML = ''; // Clear previous results
+        try {
+            for (var i = 0; i < response.result.length; i++) {
+                var address = response.result[i];
+                var myList = document.createElement('li');
+                var addressElement = document.createElement('button');
+                addressElement.textContent = address.name;
+                myList.appendChild(addressElement);
+
+                // Create a closure to capture the address values
+                (function (lat, lng) {
+                    addressElement.onclick = function zoomTo() {
+                        map.setView([lat, lng], 18);
+                    };
+                })(address.lat, address.lon);
+                resultContainer.appendChild(addressElement);
+            }
+        }
+        catch (e) {
+            alert("Adres giriniz!")
+
+        }
     }
 }
 
+buttonClearAddress.addEventListener('click', function (){
+    resultContainer.style.display = "none"
+    searchInput.value = ""
+})
+
+var scrollCheck = 0
+function scrollMenu() {
+    if (scrollCheck == 0) {
+        buttonContainerFirst.style.left = "1px";
+        buttonContainerThird.style.left = "1px";
+        scrollCheck += 1
+    } else if (buttonContainerFirst.style.left == "-60px" && buttonContainerThird.style.top == "120px") {
+        console.log("1")
+        buttonContainerFirst.style.left = "1px";
+        buttonContainerThird.style.left = "1px";
+    } else if (buttonContainerFirst.style.left == "-60px" && buttonContainerThird.style.top != "120px") {
+        console.log("2")
+        buttonContainerFirst.style.left = "1px";
+        buttonContainerThird.style.top = "120px"
+        buttonContainerThird.style.left = "1px";
+    } else {
+        console.log("3")
+        buttonContainerFirst.style.left = "-60px"
+        buttonContainerSecond.style.left = "-60px"
+        buttonContainerThird.style.left = "-60px";
+    }
+}
 // Get the popup and the close button
 const popup = document.querySelector('.popup');
 const closeBtn = popup.querySelector('.close-btn');
@@ -353,16 +429,18 @@ var toggleCount = 0
 // add an event listener to the button
 toggleLayerBtn.addEventListener('click', function () {
 
-    if (toggleCount % 2 == 0) {
-        buttonContainerThird.style.top = "340px"
+    if (toggleCount == 0) {
+        buttonContainerThird.style.top = "325px"
         buttonContainerSecond.style.left = "20px";
-        buttonContainerSecond.style.marginTop = "8px"
         toggleCount += 1
-    } else {
-        buttonContainerThird.style.top = "150px"
-        buttonContainerSecond.style.left = "-50px";
-        buttonContainerSecond.style.marginTop = "0px"
-        toggleCount += 1
+    } else if(buttonContainerThird.style.top == "325px") {
+        console.log("1")
+        buttonContainerSecond.style.left = "-60px"
+        buttonContainerThird.style.top = "120px"
+    } else{
+        console.log("2")
+        buttonContainerThird.style.top = "325px"
+        buttonContainerSecond.style.left = "20px";
     }
 
 
@@ -636,18 +714,20 @@ var drawControl = new L.Control.Draw({
 map.addControl(drawControl);
 
 var addMarkerPopup = document.getElementById('add-marker-popup')
-var PopupAddButton = document.getElementById('add-button')
+var popupAddButton = document.getElementById('add-button')
 var popupCancelButtonAdd = document.getElementById('cancel-button-add')
 
 let locationValuesList = [];
 let addedLayers = []
+
 map.on('draw:created', function (e) {
 
     addMarkerPopup.style.display = "block"
     darkScreen.style.display = "block"
     var type = e.layerType,
         layer = e.layer;
-    PopupAddButton.addEventListener('click', function () {
+    popupAddButton.addEventListener('click', function () {
+        preLoader.style.display = "block"
         if (type === 'marker') {
             // Do something with the marker here, e.g. send it to the server
             var latlng = layer.getLatLng();
@@ -682,21 +762,21 @@ map.on('draw:created', function (e) {
 
                     // Add the properties to the marker popup
                     layer.bindPopup(
-                        '<b>Lokasyon:</b> ' + locationValue +
-                        '<br><b>Enlem:</b> ' + latlng.lat.toFixed(6) +
-                        '<br><b>Boylam:</b> ' + latlng.lng.toFixed(6) +
-                        '<br><b>Id:</b> ' + response['id'] +
-                        '<br><b>Gridcode:</b> ' + response['gridcode'] +
-                        '<br><b>Uygunluk:</b> ' + response['suitability'] +
-                        '<br><b>Mahalle:</b> ' + response['mahalle_ad'] +
-                        '<br><b>İlçe:</b> ' + response['ilce_ad'] +
-                        '<br><b>Ses Segment:</b> ' + response['ses_segment'] +
-                        '<br><b>Nüfus:</b> ' + response['nufus'] +
-                        '<br><b>Yapi Nüfus:</b> ' + response['yapi_nufus'] +
-                        '<br><b>Yapı Sayısı:</b> ' + response['yapi_sayisi'] +
-                        '<br><b>Potansiyel Satış:</b> ' + response['potansiyel_satis'] +
+                        '<b class="popup-el">Lokasyon:</b> ' + locationValue +
+                        '<br><b class="popup-el">Enlem:</b> ' + latlng.lat.toFixed(6) +
+                        '<br><b class="popup-el">Boylam:</b> ' + latlng.lng.toFixed(6) +
+                        '<br><b class="popup-el">Id:</b> ' + response['id'] +
+                        '<br><b class="popup-el">Gridcode:</b> ' + response['gridcode'] +
+                        '<br><b class="popup-el">Uygunluk:</b> ' + response['suitability'] +
+                        '<br><b class="popup-el">Mahalle:</b> ' + response['mahalle_ad'] +
+                        '<br><b class="popup-el">İlçe:</b> ' + response['ilce_ad'] +
+                        '<br><b class="popup-el">Ses Segment:</b> ' + response['ses_segment'] +
+                        '<br><b class="popup-el">Mahalle Nüfus:</b> ' + response['nufus'] +
+                        '<br><b class="popup-el">Erişilebilir Nüfus:</b> ' + response['yapi_nufus'] +
+                        '<br><b class="popup-el">Erişilebilir Yapı Sayısı:</b> ' + response['yapi_sayisi'] +
+                        '<br><b class="popup-el">Potansiyel Satış:</b> ' + response['potansiyel_satis'] + '<ion-icon name="information-circle-sharp" style="cursor:pointer" id="potential-sale-info"></ion-icon>' +
                         '<br><a href="https://www.google.com/maps?layer=c&cbll=' +
-                        String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank">GOOGLE STREET VIEW</a>')
+                        String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank"><img id="google-street-view-pic" src="https://images2.imgbox.com/54/82/bXyXnV9Z_o.png" ></a>')
                     gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                     locationValuesList.push(parseFloat(gridcodeValue));
                     var els = document.getElementById("marker-table").getElementsByTagName("tr");
@@ -737,7 +817,16 @@ map.on('draw:created', function (e) {
             });
         }
         addMarkerPopup.style.display = "none"
+        setTimeout(function() {
+            preLoader.style.display = 'none';
+        }, 2250);
     })
+
+        popupCancelButtonAdd.addEventListener('click', function () {
+        // Handle the case when the layer type is not 'marker'
+        layer = null; // Set layer to null to prevent adding it to drawnItems
+    })
+
 
     // Define a custom control for the compare button
     var compareButton = L.Control.extend({
@@ -880,10 +969,15 @@ var count = 0;
 
 function deleteClickManage() {
     isDeleteClickManageActive = true;
+
+    if (drawnItems.getLayers().length > 0) {
     var currentMarker = drawnItems.getLayers()[drawnItems.getLayers().length - 1];
-    addedLayers.pop();
+
 
     drawnItems.removeLayer(currentMarker);
+    }else{
+        console.log("pass")
+    }
 }
 
 var isClickManageActive = false;

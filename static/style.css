@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&family=Roboto+Condensed&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@100&display=swap');
+* {
+    font-family: 'Geologica', sans-serif;
+}
 
 #map {
     position: absolute;
@@ -16,6 +19,7 @@ body {
     height: 98%;
 }
 
+
 #dark-screen {
     display: block;
     background: black;
@@ -28,6 +32,97 @@ body {
     width: 100vw;
     z-index: 4;
     opacity: 0.6;
+}
+
+#search-bar-container {
+    z-index: 3;
+    position: relative;
+    top: 22px;
+    left: 200px;
+    width: 300px;
+    transform: translate(-50%, -50%);
+    border: 1px solid #808080;
+    border-radius: 25px;
+}
+
+#search-bar-container #search-bar-input {
+    width: 300px;
+    height: 28px;
+    text-indent: 6px;
+    border-radius: 25px;
+}
+
+#search-bar-container #submit-button {
+    position: absolute;
+    height: 35px;
+    width: 73px;
+    top: 48%;
+    left: 90%;
+    border-radius: 25px;
+    transform: translate(-50%, -50%);
+    transition: 0.5s ease all;
+    cursor: pointer;
+}
+
+#search-bar-container #submit-button:hover {
+    background-color: #afadad;
+    cursor: pointer;
+    color:white;
+}
+
+#result-container {
+    position: absolute;
+    top: 35px;
+    left:2px;
+    width: 302px;
+    max-height: 150px;
+    overflow-y: scroll;
+    display: block;
+}
+
+#result-container button {
+    z-index: 2;
+    display: block;
+    width: 285px;
+    min-height: 25px;
+    padding: 1px;
+    border: 1px solid grey;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: 0.4s ease all;
+}
+
+#result-container button:hover {
+    background-color: dodgerblue;
+    color:white;
+}
+
+
+#pre-loader {
+    background: #000 url("../static/Ibb_amblem.png") no-repeat center center;
+    background-size: 20%;
+    height: 100vh;
+    width: 100vw;
+    left: 0;
+    top: 0;
+    position: fixed;
+    z-index: 10;
+    margin: 0;
+    padding: 0;
+    opacity: 0.7;
+    display: none;
+}
+
+@keyframes flip-horizontal {
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(-1);
+  }
+  100% {
+    transform: scaleX(1);
+  }
 }
 
 .leaflet-right .leaflet-control {
@@ -329,7 +424,7 @@ body {
     position: relative;
     height: 50px;
     width: 45px;
-    top: 157px;
+    top: 130px;
     margin-left: -1px;
     left: -60px;
     border-radius: 5px;
@@ -342,7 +437,7 @@ body {
     position: relative;
     height: 0px;
     width: 45px;
-    top: 100px;
+    top: 80px;
     margin-left: -1px;
     left: -60px;
     border-radius: 5px;
@@ -355,7 +450,7 @@ body {
     position: relative;
     height: 217px;
     width: 45px;
-    top: 150px;
+    top: 120px;
     margin-left: -1px;
     left: -60px;
     border-radius: 5px;
@@ -378,6 +473,10 @@ body {
     background-color: green;
     color: white;
     transition: all 1s ease;
+}
+
+#add-marker-button {
+    cursor: pointer;
 }
 
 #toggle-layer {
@@ -503,7 +602,35 @@ body {
     height: 32px;
     margin: 3px;
     padding: 3px;
-    font-family: "Calibri Light";
     font-size: 18px;
     border-radius: 5px;
 }
+
+.popup-el {
+    font-size: 13px;
+}
+
+#google-street-view-pic {
+    height: 40px;
+    margin-left: 42px;
+    border: 0.5px solid grey;
+    padding: 2px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#clear-address{
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    top:20%;
+    left:68%;
+    color:grey;
+    cursor: pointer;
+    text-indent: 8px;
+}
+
+#clear-address:hover{
+    color:gray;
+}
+

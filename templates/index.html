@@ -18,14 +18,30 @@
 </head>
 
 <body>
+
+<div id="pre-loader">
+
+</div>
+
 <div id="dark-screen">
 
 </div>
+
+
 <div id="map"></div>
 
 <button id="menu" title="Menü" type="button">
     <ion-icon name="menu-outline" size="large"></ion-icon>
 </button>
+
+<div id="search-bar-container">
+    <form onsubmit="submitForm(event)">
+        <input type="text" placeholder="Adress Giriniz" id="search-bar-input" name="search-bar-input">
+        <a id="clear-address">X</a>
+        <button type="submit" id="submit-button"><ion-icon name="search-sharp" style="font-size: 19px"></ion-icon> </button>
+    </form>
+    <div id="result-container"></div>
+</div>
 
 <div id="all-items-delete-popup">
     <h3 style="margin: 0; padding: 0;"> Tüm Konumları Silmek İstiyor Musunuz?</h3>
@@ -36,9 +52,9 @@
 </div>
 
 <div id="add-marker-popup">
-    <h3>İşaretçi Eklemek İstiyor Musunuz?</h3>
+    <h3>Konum Eklemek İstiyor Musunuz?</h3>
     <div class="popup-buttons-container">
-        <input id="add-input" type="text" placeholder="İşaretçi İsmi Giriniz: ">
+        <input id="add-input" type="text" placeholder="Konum İsmi Giriniz: ">
         <button id="add-button">Ekle</button>
         <button id="cancel-button-add">İptal</button>
     </div>
@@ -72,16 +88,16 @@
     <button title="Tabloda Göster" id="show-table">
         <i class="fa fa-solid fa-chart-line" style="font-size: 17px;"></i>
     </button>
-    <button title="Tüm İşaretçileri Sil" id="delete-features">
+    <button title="Tüm Konumları Sil" id="delete-features">
         <ion-icon name="trash"></ion-icon>
     </button>
-    <button title="Son İşaretçiyi Sil" id="delete-last-feature">
+    <button title="Son Konumu Sil" id="delete-last-feature">
         <i class="fa fa-regular fa-arrow-left"></i>
     </button>
-    <button title="Seçili İşaretçiyi Sil" id="delete-selected-feature">
+    <button title="Seçili Konumu Sil" id="delete-selected-feature">
         <i class="fa fa-solid fa-eraser"></i>
     </button>
-    <button title="Tüm İşaretçi Özelliklerini Kaydet" id="save-features">
+    <button title="Tüm Konum Özelliklerini Kaydet" id="save-features">
         <i class="fa fa-solid fa-download"></i>
     </button>
 </div>
@@ -98,12 +114,12 @@
             <th>GRIDCODE</th>
             <th>UYGUNLUK</th>
             <th>MAHALLE</th>
-            <th>ILCE</th>
-            <th>SES_SEGMENT</th>
-            <th>NUFUS</th>
-            <th>YAPI_NUFUS</th>
-            <th>YAPI_SAYISI</th>
-            <th>POTANSIYEL_SATIS</th>
+            <th>İLÇE</th>
+            <th>SES SEGMENT</th>
+            <th>MAHALLE NÜFUS</th>
+            <th>ERİŞİLEBİLİR NÜFUS</th>
+            <th>ERİŞİLEBİLİR YAPI SAYISI</th>
+            <th>POTANSİYEL SATIŞ</th>
         </tr>
         </thead>
         <tbody>
@@ -126,7 +142,7 @@
         <ion-icon name="close-circle-outline"></ion-icon>
     </button>
     <div class="item-container">
-        <i class="fa fa-map-marker" aria-hidden="true"></i> - Bu haritaya bir marker eklemek için kullanılır.
+        <i class="fa fa-map-marker" aria-hidden="true"></i> - Bu haritaya bir konum(marker) eklemek için kullanılır.
     </div>
     <div class="item-container">
         <i class="fa fa-regular fa-layer-group"></i> - Bu buton bir katmanın açık veya kapalı olmasını değiştirmek için
