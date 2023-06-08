@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@100&display=swap');
+
 * {
     font-family: 'Geologica', sans-serif;
 }
@@ -34,6 +35,47 @@ body {
     opacity: 0.6;
 }
 
+#white-screen {
+    display: none;
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 4;
+    opacity: 0.6;
+}
+
+#tutorial-gif-container {
+    width: 600px;
+    height: 300px;
+    z-index: 5;
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid grey;
+    box-shadow: 1px 1px 10px 10px #035e4d;
+    background-color: white;
+}
+
+#close-gif-button{
+    font-size: 20px;
+    position: absolute;
+    top: 1%;
+    right: 1%;
+    border-radius: 50%;
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+}
+
 #search-bar-container {
     z-index: 3;
     position: relative;
@@ -67,13 +109,13 @@ body {
 #search-bar-container #submit-button:hover {
     background-color: #afadad;
     cursor: pointer;
-    color:white;
+    color: white;
 }
 
 #result-container {
     position: absolute;
     top: 35px;
-    left:2px;
+    left: 2px;
     width: 302px;
     max-height: 150px;
     overflow-y: scroll;
@@ -94,12 +136,12 @@ body {
 
 #result-container button:hover {
     background-color: dodgerblue;
-    color:white;
+    color: white;
 }
 
 
 #pre-loader {
-    background: #000 url("../static/Ibb_amblem.png") no-repeat center center;
+    background: transparent url("../static/Ibb_amblem.png") no-repeat center center;
     background-size: 20%;
     height: 100vh;
     width: 100vw;
@@ -114,15 +156,15 @@ body {
 }
 
 @keyframes flip-horizontal {
-  0% {
-    transform: scaleX(1);
-  }
-  50% {
-    transform: scaleX(-1);
-  }
-  100% {
-    transform: scaleX(1);
-  }
+    0% {
+        transform: scaleX(1);
+    }
+    50% {
+        transform: scaleX(-1);
+    }
+    100% {
+        transform: scaleX(1);
+    }
 }
 
 .leaflet-right .leaflet-control {
@@ -401,7 +443,7 @@ body {
     top: 125px;
     z-index: 2;
     border-radius: 5px;
-    background: #009578;
+    background: #035e4d;
     color: #ffffff;
     display: inline-flex;
     align-items: center;
@@ -606,6 +648,17 @@ body {
     border-radius: 5px;
 }
 
+#activate-tutorials {
+    position: absolute;
+    top: 210px;
+    width: 32px;
+    height: 32px;
+    margin: 3px;
+    padding: 3px;
+    font-size: 18px;
+    border-radius: 5px;
+}
+
 .popup-el {
     font-size: 13px;
 }
@@ -619,18 +672,58 @@ body {
     cursor: pointer;
 }
 
-#clear-address{
+#clear-address {
     position: absolute;
     width: 24px;
     height: 24px;
-    top:20%;
-    left:68%;
-    color:grey;
+    top: 20%;
+    left: 68%;
+    color: grey;
     cursor: pointer;
     text-indent: 8px;
 }
 
-#clear-address:hover{
-    color:gray;
+#clear-address:hover {
+    color: gray;
 }
 
+#potential-info {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    display: none;
+    z-index: 5;
+    border-radius: 10px;
+    border: 2px solid grey;
+}
+
+#potential-sale-info {
+    border: none;
+    background-color: white;
+    display: inline;
+}
+
+#potential-info-container {
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    height: 300px;
+    padding: 10px;
+
+}
+
+#potential-info-container-positioner {
+    text-align: right;
+}
+
+#potential-info-container-positioner a {
+    text-decoration: none;
+    font-size: 15px;
+}
+
+/*.custom-icon{*/
+/*    !*background-color: red;*!*/
+/*    border-radius: 50px;*/
+/*}*/

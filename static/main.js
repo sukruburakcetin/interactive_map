@@ -2,6 +2,8 @@ var menuBtn = document.getElementById('menu')
 
 var darkScreen = document.getElementById('dark-screen')
 
+var whiteScreen = document.getElementById('white-screen')
+
 var addInput = document.getElementById('add-input')
 
 menuBtn.addEventListener('click', scrollMenu)
@@ -19,7 +21,7 @@ var searchInput = document.getElementById('search-bar-input')
 var resultContainer = document.getElementById('result-container');
 
 var potentialSaleInfo = document.getElementById('#potential-sale-info')
-searchInput.addEventListener('click', function (){
+searchInput.addEventListener('click', function () {
     resultContainer.style.display = 'block'
 })
 
@@ -64,20 +66,20 @@ function submitForm(event) {
                 })(address.lat, address.lon);
                 resultContainer.appendChild(addressElement);
             }
-        }
-        catch (e) {
+        } catch (e) {
             alert("Adres giriniz!")
 
         }
     }
 }
 
-buttonClearAddress.addEventListener('click', function (){
+buttonClearAddress.addEventListener('click', function () {
     resultContainer.style.display = "none"
     searchInput.value = ""
 })
 
 var scrollCheck = 0
+
 function scrollMenu() {
     if (scrollCheck == 0) {
         buttonContainerFirst.style.left = "1px";
@@ -99,6 +101,7 @@ function scrollMenu() {
         buttonContainerThird.style.left = "-60px";
     }
 }
+
 // Get the popup and the close button
 const popup = document.querySelector('.popup');
 const closeBtn = popup.querySelector('.close-btn');
@@ -143,6 +146,28 @@ showTableBtn.addEventListener('click', function () {
 
 var tableId = document.getElementById('marker-table');
 var tBody = tableId.getElementsByTagName('tbody')[0];
+
+var tutorialButtonChecker = 0;
+
+var tutorialBtn = document.getElementById('activate-tutorials')
+
+var deleteSelectedFeatureButton = document.getElementById('delete-selected-feature');
+tutorialBtn.addEventListener('click', function () {
+    if (tutorialButtonChecker % 2 === 0) {
+        tutorialBtn.style.backgroundColor = "green"
+        tutorialBtn.style.color = "white"
+        tutorialButtonChecker += 1;
+    }else if(deleteSelectedFeatureButton.style.backgroundColor == "green"){
+      tutorialGifContainerDsf.style.display= "block"
+    } else {
+        tutorialBtn.style.backgroundColor = "#F0F0F0"
+        tutorialBtn.style.color = "black"
+        tutorialBtn.style.fontSize = "18px";
+        tutorialButtonChecker += 1;
+    }
+
+})
+
 
 tBody.addEventListener("mouseover", function () {
     tBody.style.overflowY = "scroll"
@@ -228,7 +253,7 @@ var layerControl = L.control.layers({
 var suitabilityLayer;
 
 $.getJSON('/static/IHE_UYGUNLUK_YENI.geojson', function (data) {
-    console.log("buraya bak", data); // log the GeoJSON data
+    console.log(data); // log the GeoJSON data
     // create a new GeoJSON layer and assign it to the suitabilityLayer variable
     suitabilityLayer = L.geoJSON(data, {
         style: function (feature) {
@@ -433,11 +458,11 @@ toggleLayerBtn.addEventListener('click', function () {
         buttonContainerThird.style.top = "325px"
         buttonContainerSecond.style.left = "20px";
         toggleCount += 1
-    } else if(buttonContainerThird.style.top == "325px") {
+    } else if (buttonContainerThird.style.top == "325px") {
         console.log("1")
         buttonContainerSecond.style.left = "-60px"
         buttonContainerThird.style.top = "120px"
-    } else{
+    } else {
         console.log("2")
         buttonContainerThird.style.top = "325px"
         buttonContainerSecond.style.left = "20px";
@@ -713,6 +738,7 @@ var drawControl = new L.Control.Draw({
 
 map.addControl(drawControl);
 
+var legendMarkers;
 var addMarkerPopup = document.getElementById('add-marker-popup')
 var popupAddButton = document.getElementById('add-button')
 var popupCancelButtonAdd = document.getElementById('cancel-button-add')
@@ -723,7 +749,7 @@ let addedLayers = []
 map.on('draw:created', function (e) {
 
     addMarkerPopup.style.display = "block"
-    darkScreen.style.display = "block"
+    whiteScreen.style.display = "block"
     var type = e.layerType,
         layer = e.layer;
     popupAddButton.addEventListener('click', function () {
@@ -733,7 +759,6 @@ map.on('draw:created', function (e) {
             var latlng = layer.getLatLng();
             // var locationValue = prompt("Please enter the location value:", "");
             var locationValue = document.getElementById('add-input').value;
-            darkScreen.style.display = "none"
             $.ajax({
                 url: '/save-points',
                 type: 'POST',
@@ -756,6 +781,8 @@ map.on('draw:created', function (e) {
                         '<td>' + response.nufus + '</td>' +
                         '<td>' + response.yapi_nufus + '</td>' +
                         '<td>' + response.yapi_sayisi + '</td>' +
+                        '<td>' + response.ilce_ihe_bufe_sayisi + '</td>' +
+                        '<td>' + response.mahalle_ihe_bufe_sayisi + '</td>' +
                         '<td>' + response.potansiyel_satis + '</td>' +
                         '</tr>';
                     $('#marker-table tbody').append(newRow);
@@ -774,9 +801,14 @@ map.on('draw:created', function (e) {
                         '<br><b class="popup-el">Mahalle Nüfus:</b> ' + response['nufus'] +
                         '<br><b class="popup-el">Erişilebilir Nüfus:</b> ' + response['yapi_nufus'] +
                         '<br><b class="popup-el">Erişilebilir Yapı Sayısı:</b> ' + response['yapi_sayisi'] +
-                        '<br><b class="popup-el">Potansiyel Satış:</b> ' + response['potansiyel_satis'] + '<ion-icon name="information-circle-sharp" style="cursor:pointer" id="potential-sale-info"></ion-icon>' +
+                        '<br><b class="popup-el">İlçe İhe Büfe Sayısı:</b> ' + response['ilce_ihe_bufe_sayisi'] +
+                        '<br><b class="popup-el">Mahalle İhe Büfe Sayısı:</b> ' + response['mahalle_ihe_bufe_sayisi'] +
+                        '<br><button id="potential-sale-info" onclick="showInfo()"><ion-icon name="information-circle-sharp" style="cursor:pointer" ></ion-icon></button>' + '<b class="popup-el">Potansiyel Satış:</b> ' + response['potansiyel_satis'] +
                         '<br><a href="https://www.google.com/maps?layer=c&cbll=' +
-                        String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank"><img id="google-street-view-pic" src="https://images2.imgbox.com/54/82/bXyXnV9Z_o.png" ></a>')
+                        String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank"><img id="google-street-view-pic" src="https://images2.imgbox.com/54/82/bXyXnV9Z_o.png" ></a>'
+                    );
+
+
                     gridcodeValue = isNaN(parseFloat(response['gridcode'])) ? 0 : response['gridcode'];
                     locationValuesList.push(parseFloat(gridcodeValue));
                     var els = document.getElementById("marker-table").getElementsByTagName("tr");
@@ -815,16 +847,22 @@ map.on('draw:created', function (e) {
                     console.log("fail_return_log", error);
                 }
             });
+
+
+            whiteScreen.style.display = "none"
         }
+
         addMarkerPopup.style.display = "none"
-        setTimeout(function() {
+        setTimeout(function () {
             preLoader.style.display = 'none';
         }, 2250);
     })
 
-        popupCancelButtonAdd.addEventListener('click', function () {
+
+    popupCancelButtonAdd.addEventListener('click', function () {
         // Handle the case when the layer type is not 'marker'
         layer = null; // Set layer to null to prevent adding it to drawnItems
+        whiteScreen.style.display = "none"
     })
 
 
@@ -875,8 +913,23 @@ map.on('draw:created', function (e) {
         _onClick: function () {
             // Find the highest value in locationValuesList
 
+
+            if (legendMarkers) {
+                // Remove the existing legend control from the map
+                console.log("burak")
+                map.removeControl(legendMarkers);
+            }
             var highestValue = Math.max.apply(Math, locationValuesList);
+            console.log("highest", highestValue)
             if (highestValue > 0) {
+                var totalMarkerCount = locationValuesList.length
+                var colorIncrementFactor = parseInt(256 / totalMarkerCount)
+                console.log("colorInFac", colorIncrementFactor)
+                locationValuesList.sort(function (a, b) {
+                    return a - b;
+                });
+
+                console.log("locationvaluelist:", locationValuesList)
 
                 // Loop through each layer in the drawnItems feature group
                 drawnItems.eachLayer(function (layer) {
@@ -885,12 +938,20 @@ map.on('draw:created', function (e) {
                         // Get the location value from the marker's popup content
                         var popupContent = layer.getPopup().getContent();
 
-                        var locationValue = parseFloat(popupContent.split('<b>Gridcode:</b> ')[1]);
+                        var locationValue = parseFloat(popupContent.split('<b class="popup-el">Gridcode:</b> ')[1]);
 
                         layer.setIcon(new L.Icon({
-                            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+                            iconUrl: 'https://images2.imgbox.com/a5/a6/MlVf9aUS_o.png',
                             iconSize: [25, 41],
+                            className: 'custom-icon'
                         }));
+
+                        var currentIndex = locationValuesList.indexOf(locationValue) + 1
+                        console.log("currentIndex", currentIndex)
+                        var customIcon = layer._icon;
+                        customIcon.style.backgroundColor = `rgb(255, ${255 - (currentIndex * colorIncrementFactor)}, 0)`
+                        customIcon.style.borderRadius = "50px";
+                        console.log("aa")
 
                         // If the location value matches the highest value, add a custom marker icon
                         if (locationValue === highestValue) {
@@ -913,6 +974,21 @@ map.on('draw:created', function (e) {
             } else {
                 alert("İşaretçiler sınır dışında!")
             }
+
+            legendMarkers = L.control({position: 'bottomright'});
+
+            legendMarkers.onAdd = function (map) {
+                var div = L.DomUtil.create('div');
+                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Konum Uygunluk Değeri</h4>';
+                div.innerHTML += '<div style="background: rgb(255,255,0); background: linear-gradient(0deg, rgba(255,255,0,1) 0%, rgba(255,0,0,1) 100%); width: 20px; height: 100px; display: inline-block; border: 2px solid black;"></div>' +
+                    '<span style="position:absolute; font-size: 22px; margin-left: 5px; margin-top: -5px">5</span>' +
+                    '<span style=" margin-left:5px; font-size: 22px;">1</span><br>';
+
+                return div;
+            };
+
+            // add the legend control to the map
+            legendMarkers.addTo(map); // add the legend control to the map
         }
     });
     map.addControl(new compareButton());
@@ -945,22 +1021,49 @@ deleteLastFeatureButton.addEventListener('click', function () {
     }
 });
 
+var tutorialGifContainerDsf = document.getElementById('tutorial-gif-container');
+var closeGifButton = document.getElementById("close-gif-button")
+
+closeGifButton.addEventListener("click", function () {
+    darkScreen.style.display = "none";
+    tutorialGifContainerDsf.style.display = "none";
+    deleteSelectedFeatureButton.style.backgroundColor = "#F0F0F0"
+    deleteSelectedFeatureButton.style.color = "black"
+    deleteSelectedFeatureButton.style.fontSize = "18px";
+})
+
 var isClickManageActive = false;
-var deleteSelectedFeatureButton = document.getElementById('delete-selected-feature');
 checkerDeleteSelectedFeature = 0;
 // Add a click event listener to the button
 deleteSelectedFeatureButton.addEventListener('click', function () {
-    checkerDeleteSelectedFeature += 1
 
-    if (checkerDeleteSelectedFeature % 2 === 1) {
-        deleteSelectedFeatureButton.style.backgroundColor = "green"
-        deleteSelectedFeatureButton.style.color = "white"
-        clickManage()
+    // if (deleteSelectedFeatureButton.style.backgroundColor == "green") {
+    //     deleteSelectedFeatureButton.style.backgroundColor = "#F0F0F0"
+    //     deleteSelectedFeatureButton.style.color = "black"
+    //     deleteSelectedFeatureButton.style.fontSize = "18px";
+    // } else {
+    //     deleteSelectedFeatureButton.style.backgroundColor = "green"
+    //     deleteSelectedFeatureButton.style.color = "white"
+    // }
+
+    if (checkerDeleteSelectedFeature % 2 === 0) {
+        if (tutorialButtonChecker % 2 === 0) {
+            clickManage()
+            checkerDeleteSelectedFeature+= 1
+        } else {
+            tutorialGifContainerDsf.style.display = 'block';
+            darkScreen.style.display = 'block'
+            deleteSelectedFeatureButton.style.backgroundColor = "green"
+            deleteSelectedFeatureButton.style.color = "white"
+        }
+
+
     } else {
         isClickManageActive = false;
         deleteSelectedFeatureButton.style.backgroundColor = "#F0F0F0"
         deleteSelectedFeatureButton.style.color = "black"
         deleteSelectedFeatureButton.style.fontSize = "18px";
+        checkerDeleteSelectedFeature+= 1
     }
 });
 
@@ -969,13 +1072,13 @@ var count = 0;
 
 function deleteClickManage() {
     isDeleteClickManageActive = true;
-
+    checkerDeleteSelectedFeature += 1
     if (drawnItems.getLayers().length > 0) {
-    var currentMarker = drawnItems.getLayers()[drawnItems.getLayers().length - 1];
+        var currentMarker = drawnItems.getLayers()[drawnItems.getLayers().length - 1];
 
 
-    drawnItems.removeLayer(currentMarker);
-    }else{
+        drawnItems.removeLayer(currentMarker);
+    } else {
         console.log("pass")
     }
 }
@@ -1058,7 +1161,7 @@ PopupCancelButtonDelete.addEventListener('click', function () {
 });
 
 function saveData() {
-    var csv = "ID, LOKASYON, ENLEM, BOYLAM, GRIDCODE, UYGUNLUK, MAHALLE, ILCE, SES_SEGMENT, NUFUS, YAPI_NUFUS, YAPI_SAYISI, POTALSIYEL_SATIS\n";
+    var csv = "ID, LOKASYON, ENLEM, BOYLAM, GRIDCODE, UYGUNLUK, MAHALLE, ILCE, SES_SEGMENT, NUFUS, YAPI_NUFUS, YAPI_SAYISI, ILCE_IHE_BUFE_SAYISI, MAHALLE_IHE_BUFE_SAYISI, POTALSIYEL_SATIS\n";
     $('#marker-table tbody tr').each(function (index, row) {
         // Do something with the row, for example:
         csv += $(row).find('td:first').text() + "," + $(row).find('td:eq(1)').text() + ","
@@ -1068,6 +1171,8 @@ function saveData() {
             + "," + $(row).find('td:eq(8)').text() + "," + $(row).find('td:eq(9)').text()
             + "," + $(row).find('td:eq(10)').text() + "," + $(row).find('td:eq(11)').text()
             + "," + $(row).find('td:eq(12)').text() + "," + $(row).find('td:eq(13)').text()
+            + "," + $(row).find('td:eq(14)').text() + "," + $(row).find('td:eq(15)').text()
+            + "," + $(row).find('td:eq(16)').text() + "," + $(row).find('td:eq(17)').text()
         csv += "\n"
     });
     // Prompt the user to download the CSV file
@@ -1077,6 +1182,18 @@ function saveData() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+var potentialInfo = document.getElementById("potential-info")
+
+function showInfo() {
+    potentialInfo.style.display = "block";
+    darkScreen.style.display = "block";
+}
+
+function closePotentialInfo() {
+    potentialInfo.style.display = "none";
+    darkScreen.style.display = "none"
 }
 
 document.getElementById("save-features").addEventListener("click", saveData);

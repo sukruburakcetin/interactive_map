@@ -13,6 +13,7 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
+
 @app.route("/locate-addresses", methods=["POST"])
 def locate_addresses():
     import requests
@@ -25,14 +26,14 @@ def locate_addresses():
         data_geocoding_result = requests.get(url=api_url, params=search_param).json()
         return jsonify(data_geocoding_result)
     else:
-        return jsonify({"message":"address is not available"})
+        return jsonify({"message": "address is not available"})
 
 
 @app.route("/save-points", methods=["POST"])
 def save_points():
     cnx = cx_Oracle.connect('MAKS_EDU/MXEDU18TT@exa1-scan.ibb.gov.tr:1472/TESTCBS')
     cursor = cnx.cursor()
-    #
+
     # sql = '''CREATE TABLE IHE_UYGUNLUK(
     #      LOKASYON CHAR(50),
     #      ENLEM FLOAT,
@@ -46,7 +47,9 @@ def save_points():
     #      NUFUS INT,
     #      YAPI_NUFUS INT,
     #      YAPI_SAYISI INT,
-    #      POTANSIYEL_SATIS FLOAT
+    #      ILCE_IHE_BUFE_SAYISI INT,
+    #      MAHALLE_IHE_BUFE_SAYISI INT,
+    #      POTANSIYEL_SATIS CHAR(50)
     # )'''
     #
     # cursor.execute(sql)
@@ -66,7 +69,7 @@ def save_points():
               encoding='utf-8') as f:
         ihe_uygunluk_geojson = json.load(f)
 
-    with open('./static/ALLFEATURES_NEW.geojson', 'r', encoding='utf-8') as f:
+    with open('./static/ALLFEATURES_NEW2.geojson', 'r', encoding='utf-8') as f:
         mahalle_geojson = json.load(f)
 
     mah_ad = ""
@@ -75,6 +78,8 @@ def save_points():
     ses_segment = ""
     yapi_nufus = ""
     yapi_sayisi = ""
+    ilce_ihe_bufe_sayisi = ""
+    mahalle_ihe_bufe_sayisi = ""
     potansiyel_satis = ""
 
     for k in range(0, len(mahalle_geojson['features'])):
@@ -106,6 +111,14 @@ def save_points():
                 except:
                     pass
                 try:
+                    ilce_ihe_bufe_sayisi = mahalle_geojson['features'][k]['properties']['ILCE_IHE_BUFE_SAYISI']
+                except:
+                    pass
+                try:
+                    mahalle_ihe_bufe_sayisi = mahalle_geojson['features'][k]['properties']['MAHALLE_IHE_BUFE_SAYISI']
+                except:
+                    pass
+                try:
                     potansiyel_satis = mahalle_geojson['features'][k]['properties']['POTANSIYEL_SATIS']
                 except:
                     pass
@@ -117,6 +130,9 @@ def save_points():
                 nufus = 0
                 yapi_nufus = 0
                 yapi_sayisi = 0
+                ilce_ihe_bufe_sayisi = 0
+                mahalle_ihe_bufe_sayisi = 0
+                potansiyel_satis = ""
 
     # Find all the shapes that intersect with the polygon
     intersecting_shapes = []
@@ -190,7 +206,6 @@ def save_points():
         elif 1 < final_suitability_value < 2:
             suitability = "Uygun Değil-Az Uygun"
 
-
         # sonra bu degeri marker'a bind edip html tarafında ajax koduyla bu veriyi consume edip ekrana yansıtıyorum
         feature = {
             'type': 'Feature',
@@ -207,7 +222,10 @@ def save_points():
             'nufus': nufus,
             'yapi_nufus': yapi_nufus,
             'yapi_sayisi': yapi_sayisi,
+            'ilce_ihe_bufe_sayisi': ilce_ihe_bufe_sayisi,
+            'mahalle_ihe_bufe_sayisi': mahalle_ihe_bufe_sayisi,
             'potansiyel_satis': potansiyel_satis
+
         }
 
         lokasyon_list = list()
@@ -222,6 +240,8 @@ def save_points():
         nufus_list = list()
         yapi_nufus_list = list()
         yapi_sayisi_list = list()
+        ilce_ihe_bufe_sayisi_list = list()
+        mahalle_ihe_bufe_sayisi_list = list()
         potansiyel_satis_list = list()
 
         lokasyon_list.append("")
@@ -236,20 +256,24 @@ def save_points():
         nufus_list.append(nufus)
         yapi_nufus_list.append(yapi_nufus)
         yapi_sayisi_list.append(yapi_sayisi)
-        potansiyel_satis_list.append("")
+        ilce_ihe_bufe_sayisi_list.append(ilce_ihe_bufe_sayisi)
+        mahalle_ihe_bufe_sayisi_list.append(mahalle_ihe_bufe_sayisi)
+        potansiyel_satis_list.append(potansiyel_satis)
 
         df = pd.DataFrame({"LOKASYON": lokasyon_list, "ENLEM": enlem_list, "BOYLAM": boylam_list,
                            "ID": id_list, "GRIDCODE": gridcode_list, "UYGUNLUK": uygunluk_list,
                            "MAHALLE": mahalle_list, "ILCE": ilce_list, "SES_SEGMENT": seg_segment_list,
                            "NUFUS": nufus_list, "YAPI_NUFUS": yapi_nufus_list, "YAPI_SAYISI": yapi_sayisi_list,
+                           "ILCE_IHE_BUFE_SAYISI": ilce_ihe_bufe_sayisi_list,
+                           "MAHALLE_IHE_BUFE_SAYISI": mahalle_ihe_bufe_sayisi_list,
                            "POTANSIYEL_SATIS": potansiyel_satis_list})
 
         df_tuples = [tuple(x) for x in df.values]
         """veritabanina yazdirma"""
         sqlTxt = 'INSERT INTO "MAKS_EDU".IHE_UYGUNLUK\
                         (LOKASYON, ENLEM, BOYLAM, ID, GRIDCODE, UYGUNLUK, MAHALLE, ILCE, SES_SEGMENT, ' \
-                 'NUFUS, YAPI_NUFUS, YAPI_SAYISI, POTANSIYEL_SATIS )\
-                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13)'
+                 'NUFUS, YAPI_NUFUS, YAPI_SAYISI, ILCE_IHE_BUFE_SAYISI, MAHALLE_IHE_BUFE_SAYISI, POTANSIYEL_SATIS)\
+                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13, :14, :15)'
 
         cursor.executemany(sqlTxt, df_tuples)
         cnx.commit()
@@ -266,6 +290,8 @@ def save_points():
         nufus_list.clear()
         yapi_nufus_list.clear()
         yapi_sayisi_list.clear()
+        ilce_ihe_bufe_sayisi_list.clear()
+        mahalle_ihe_bufe_sayisi_list.clear()
         potansiyel_satis_list.clear()
 
         intersecting_shapes.clear()
@@ -314,6 +340,8 @@ def save_points():
                     'nufus': nufus,
                     'yapi_nufus': yapi_nufus,
                     'yapi_sayisi': yapi_sayisi,
+                    'ilce_ihe_bufe_sayisi': ilce_ihe_bufe_sayisi,
+                    'mahalle_ihe_bufe_sayisi': mahalle_ihe_bufe_sayisi,
                     'potansiyel_satis': potansiyel_satis
                 }
                 break
@@ -333,6 +361,8 @@ def save_points():
                 'nufus': " ",
                 'yapi_nufus': " ",
                 'yapi_sayisi': " ",
+                'ilce_ihe_bufe_sayisi': "",
+                'mahalle_ihe_bufe_sayisi': "",
                 'potansiyel_satis': ""
             }
 
@@ -348,6 +378,8 @@ def save_points():
         nufus_list = list()
         yapi_nufus_list = list()
         yapi_sayisi_list = list()
+        ilce_ihe_bufe_sayisi_list = list()
+        mahalle_ihe_bufe_sayisi_list = list()
         potansiyel_satis_list = list()
 
         lokasyon_list.append("")
@@ -365,20 +397,24 @@ def save_points():
         nufus_list.append(nufus)
         yapi_nufus_list.append(yapi_nufus)
         yapi_sayisi_list.append(yapi_sayisi)
-        potansiyel_satis_list.append("")
+        ilce_ihe_bufe_sayisi_list.append(ilce_ihe_bufe_sayisi)
+        mahalle_ihe_bufe_sayisi_list.append(mahalle_ihe_bufe_sayisi)
+        potansiyel_satis_list.append(potansiyel_satis)
 
         df = pd.DataFrame({"LOKASYON": lokasyon_list, "ENLEM": enlem_list, "BOYLAM": boylam_list,
                            "ID": id_list, "GRIDCODE": gridcode_list, "UYGUNLUK": uygunluk_list,
                            "MAHALLE": mahalle_list, "ILCE": ilce_list, "SES_SEGMENT": seg_segment_list,
                            "NUFUS": nufus_list, "YAPI_NUFUS": yapi_nufus_list, "YAPI_SAYISI": yapi_sayisi_list,
+                           "ILCE_IHE_BUFE_SAYISI": ilce_ihe_bufe_sayisi_list,
+                           "MAHALLE_IHE_BUFE_SAYISI": mahalle_ihe_bufe_sayisi_list,
                            "POTANSIYEL_SATIS": potansiyel_satis_list})
 
         df_tuples = [tuple(x) for x in df.values]
         """veritabanina yazdirma"""
         sqlTxt = 'INSERT INTO "MAKS_EDU".IHE_UYGUNLUK\
                         (LOKASYON, ENLEM, BOYLAM, ID, GRIDCODE, UYGUNLUK, MAHALLE, ILCE, SES_SEGMENT, ' \
-                 'NUFUS, YAPI_NUFUS, YAPI_SAYISI, POTANSIYEL_SATIS )\
-                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13)'
+                 'NUFUS, YAPI_NUFUS, YAPI_SAYISI, ILCE_IHE_BUFE_SAYISI, MAHALLE_IHE_BUFE_SAYISI, POTANSIYEL_SATIS)\
+                        VALUES (:1, :2, :3, :4, :5, :6, :7, :8, :9, :10, :11, :12, :13, :14, :15)'
 
         cursor.executemany(sqlTxt, df_tuples)
         cnx.commit()
@@ -395,6 +431,8 @@ def save_points():
         nufus_list.clear()
         yapi_nufus_list.clear()
         yapi_sayisi_list.clear()
+        ilce_ihe_bufe_sayisi_list.clear()
+        mahalle_ihe_bufe_sayisi_list.clear()
         potansiyel_satis_list.clear()
         # Return the GeoJSON Feature object as a JSON response
     return jsonify(feature)

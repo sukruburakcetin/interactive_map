@@ -27,6 +27,41 @@
 
 </div>
 
+<div id="white-screen">
+
+</div>
+
+<div id="tutorial-gif-container">
+    <button id="close-gif-button">X</button>
+    <img src=".\static\tutorial_delete_selected_feature.gif" alt="delete-selected-feature-gif" width="100%">
+</div>
+
+<div id="potential-info">
+    <div id="potential-info-container">
+        <div id="potential-info-container-positioner"><a onclick="closePotentialInfo()" href="#">X</a></div>
+        <div>
+            &nbsp;&nbsp;&nbsp;&nbsp;Potansiyel satışı elde etmek için ekmek satış verileri bağımlı değişken, erişilebilen nüfus verileri ise
+            bağımsız değişken olarak kullanıldı.
+            Model eğitimi için veri seti kullanıldı ve test setinde erişilebilen nüfus verileri kullanılarak potansiyel
+            satış tahminlemesi yapıldı.
+            Bu analiz yöntemi, farklı mahallelerdeki ekmek satış potansiyellerini değerlendirmek ve satışların
+            erişilebilen
+            nüfusa bağlı olarak nasıl
+            değişebileceğini anlamak için önemli bir araçtır.
+            <br>
+            <br>
+            &nbsp;&nbsp;&nbsp;&nbsp;Potansiyel satışı elde etmek için mahalle bazında ekmek satış verileri ile erişebilen yapı nüfusu verilerine
+            sahip mahalleler kullanılarak
+            bir tahminleme işlemi gerçekleştirildi. K-means algoritması kullanılarak, sadece erişebilen yapı nüfusu
+            verilerine sahip olan mahallelerin ekmek
+            satış verileri tahminlendi. Bu tahminleme süreci, tüm mahalleler için potansiyel satış verileri elde
+            edilmesini
+            sağladı. Sonuç olarak, bu analiz
+            sayesinde erişebilen yapı nüfusu verilerine sahip olan mahallelerdeki ekmek satış potansiyelleri daha iyi
+            anlaşılmış oldu.
+        </div>
+    </div>
+</div>
 
 <div id="map"></div>
 
@@ -38,7 +73,9 @@
     <form onsubmit="submitForm(event)">
         <input type="text" placeholder="Adress Giriniz" id="search-bar-input" name="search-bar-input">
         <a id="clear-address">X</a>
-        <button type="submit" id="submit-button"><ion-icon name="search-sharp" style="font-size: 19px"></ion-icon> </button>
+        <button type="submit" id="submit-button">
+            <ion-icon name="search-sharp" style="font-size: 19px"></ion-icon>
+        </button>
     </form>
     <div id="result-container"></div>
 </div>
@@ -100,6 +137,9 @@
     <button title="Tüm Konum Özelliklerini Kaydet" id="save-features">
         <i class="fa fa-solid fa-download"></i>
     </button>
+        <button title="Ön İzlemeleri Aç/Kapa" id="activate-tutorials">
+        <ion-icon style= "font-size: 20px" name="information-circle-sharp"></ion-icon>
+    </button>
 </div>
 
 
@@ -119,6 +159,8 @@
             <th>MAHALLE NÜFUS</th>
             <th>ERİŞİLEBİLİR NÜFUS</th>
             <th>ERİŞİLEBİLİR YAPI SAYISI</th>
+            <th>İLÇE BÜFE SAYISI</th>
+            <th>MAHALLE BÜFE SAYISI</th>
             <th>POTANSİYEL SATIŞ</th>
         </tr>
         </thead>
