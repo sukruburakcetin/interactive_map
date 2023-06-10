@@ -4,6 +4,11 @@
     font-family: 'Geologica', sans-serif;
 }
 
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #891a1a #4e6217;
+}
+
 #map {
     position: absolute;
     top: 0;
@@ -63,7 +68,7 @@ body {
     background-color: white;
 }
 
-#close-gif-button{
+#close-gif-button {
     font-size: 20px;
     position: absolute;
     top: 1%;
@@ -96,9 +101,9 @@ body {
 
 #search-bar-container #submit-button {
     position: absolute;
-    height: 35px;
+    height: 34px;
     width: 73px;
-    top: 48%;
+    top: 49%;
     left: 90%;
     border-radius: 25px;
     transform: translate(-50%, -50%);
@@ -141,7 +146,7 @@ body {
 
 
 #pre-loader {
-    background: transparent url("../static/Ibb_amblem.png") no-repeat center center;
+    background: transparent url("../static/images/ibb_amblem.png") no-repeat center center;
     background-size: 20%;
     height: 100vh;
     width: 100vw;
@@ -245,15 +250,37 @@ body {
     text-indent: 12px;
 }
 
-#marker-table {
+#table-container {
+    display: none;
     position: absolute;
-    top: 620px;
-    left: 10px;
-    margin-left: 1px;
+    top: 550px;
+    left: 20px;
     z-index: 2;
-    display: none; /* hide the table by default */
+    max-width: 800px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+#table-container::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    background-color: #F5F5F5;
+}
+
+#table-container::-webkit-scrollbar {
+    width: 8px;
+    background-color: #F5F5F5;
+}
+
+#table-container::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #555;
+}
+
+#marker-table {
+    margin-left: 1px;
     border: 2px solid #b6b6b6;
-    /*background-color: white;*/
     border-radius: 5px;
 }
 
@@ -274,9 +301,9 @@ body {
 
 #marker-table thead tr th {
     border-right: 2px solid #cad7d7;
-    min-width: 102px;
-    text-align: center;
-    height: 25px;
+    min-width: 115px;
+    max-width: 115px;
+    height: 30px;
     font-size: 10px;
 }
 
@@ -288,8 +315,8 @@ body {
     border-top: 1px solid #cad7d7;
     border-right: 2px solid #cad7d7;
     text-align: center;
-    min-width: 102px;
-    max-width: 102px;
+    min-width: 115px;
+    max-width: 115px;
     height: 25px;
     font-size: 10px;
     overflow: hidden;
@@ -554,41 +581,6 @@ body {
     border-radius: 5px;
 }
 
-#toggle-layer3 {
-    position: absolute;
-    top: 130px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
-}
-
-#toggle-layer4 {
-    position: absolute;
-    top: 170px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    padding: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
-}
-
-#toggle-layer5 {
-    position: absolute;
-    top: 210px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    padding: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
-}
-
 #show-table {
     position: absolute;
     top: 10px;
@@ -665,7 +657,6 @@ body {
 
 #google-street-view-pic {
     height: 40px;
-    margin-left: 42px;
     border: 0.5px solid grey;
     padding: 2px;
     border-radius: 3px;
@@ -722,8 +713,3 @@ body {
     text-decoration: none;
     font-size: 15px;
 }
-
-/*.custom-icon{*/
-/*    !*background-color: red;*!*/
-/*    border-radius: 50px;*/
-/*}*/

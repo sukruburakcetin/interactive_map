@@ -38,7 +38,7 @@ function submitForm(event) {
         if (xhr.readyState === 4 && xhr.status === 200) {
             var response = JSON.parse(xhr.responseText);
             // Handle the response here
-            console.log(response);
+            // console.log(response);
             displayResponse(response);
         }
     };
@@ -81,24 +81,35 @@ buttonClearAddress.addEventListener('click', function () {
 var scrollCheck = 0
 
 function scrollMenu() {
-    if (scrollCheck == 0) {
+    if (scrollCheck === 0) {
         buttonContainerFirst.style.left = "1px";
         buttonContainerThird.style.left = "1px";
         scrollCheck += 1
-    } else if (buttonContainerFirst.style.left == "-60px" && buttonContainerThird.style.top == "120px") {
-        console.log("1")
+    } else if (buttonContainerFirst.style.left === "-60px" && buttonContainerThird.style.top === "120px") {
+        // console.log("1")
         buttonContainerFirst.style.left = "1px";
         buttonContainerThird.style.left = "1px";
-    } else if (buttonContainerFirst.style.left == "-60px" && buttonContainerThird.style.top != "120px") {
-        console.log("2")
+    } else if (buttonContainerFirst.style.left === "-60px" && buttonContainerThird.style.top !== "120px") {
+        // console.log("2")
         buttonContainerFirst.style.left = "1px";
         buttonContainerThird.style.top = "120px"
         buttonContainerThird.style.left = "1px";
     } else {
-        console.log("3")
+        // console.log("3")
         buttonContainerFirst.style.left = "-60px"
         buttonContainerSecond.style.left = "-60px"
         buttonContainerThird.style.left = "-60px";
+
+        try {
+            map.removeLayer(suitabilityLayer)
+            map.removeLayer(iheSubelerLayer);
+            map.removeLayer(altmisLayer);
+            map.removeControl(legend1);
+            map.removeControl(legend2);
+
+        } catch {
+            // console.log("Could not delete")
+        }
     }
 }
 
@@ -129,23 +140,28 @@ window.addEventListener('load', () => {
 
 var showTableBtn = document.getElementById('show-table');
 var markerTable = document.getElementById('marker-table');
+var tableContainer = document.getElementById('table-container')
 var checkershowTableBtn = 0
 showTableBtn.addEventListener('click', function () {
+
     markerTable.classList.toggle('show');
     checkershowTableBtn += 1
 
     if (checkershowTableBtn % 2 === 1) {
         showTableBtn.style.backgroundColor = "green"
         showTableBtn.style.color = "white"
+        tableContainer.style.display = "block"
     } else {
         showTableBtn.style.backgroundColor = "#F0F0F0"
         showTableBtn.style.color = "black"
         showTableBtn.style.fontSize = "18px";
+        tableContainer.style.display = "none"
     }
 });
 
 var tableId = document.getElementById('marker-table');
 var tBody = tableId.getElementsByTagName('tbody')[0];
+var tHead = tableId.getElementsByTagName('thead')[0];
 
 var tutorialButtonChecker = 0;
 
@@ -157,8 +173,8 @@ tutorialBtn.addEventListener('click', function () {
         tutorialBtn.style.backgroundColor = "green"
         tutorialBtn.style.color = "white"
         tutorialButtonChecker += 1;
-    }else if(deleteSelectedFeatureButton.style.backgroundColor == "green"){
-      tutorialGifContainerDsf.style.display= "block"
+    } else if (deleteSelectedFeatureButton.style.backgroundColor === "green") {
+        tutorialGifContainerDsf.style.display = "block"
     } else {
         tutorialBtn.style.backgroundColor = "#F0F0F0"
         tutorialBtn.style.color = "black"
@@ -171,10 +187,12 @@ tutorialBtn.addEventListener('click', function () {
 
 tBody.addEventListener("mouseover", function () {
     tBody.style.overflowY = "scroll"
+    tHead.style.width = "98%"
 })
 
 tBody.addEventListener("mouseout", function () {
     tBody.style.overflowY = "hidden"
+    tHead.style.width = "100%"
 })
 
 var map = L.map('map', {
@@ -252,8 +270,8 @@ var layerControl = L.control.layers({
 
 var suitabilityLayer;
 
-$.getJSON('/static/IHE_UYGUNLUK_YENI.geojson', function (data) {
-    console.log(data); // log the GeoJSON data
+$.getJSON('/static/data/ihe_uygunluk.geojson', function (data) {
+    // console.log(data); // log the GeoJSON data
     // create a new GeoJSON layer and assign it to the suitabilityLayer variable
     suitabilityLayer = L.geoJSON(data, {
         style: function (feature) {
@@ -287,60 +305,94 @@ $.getJSON('/static/IHE_UYGUNLUK_YENI.geojson', function (data) {
     });
 });
 
-// define the ulasmayanLayer variable outside of the callback function
-var ulasmayanLayer;
+// define the iheSubelerLayer variable outside of the callback function
+var iheSubelerLayer;
 
-$.getJSON('/static/IHE_ULASMAYAN_YAPI.json', function (data) {
+const geojsonMarkerOptions = {
+    radius: 8,
+    fillColor: '#ff7800',
+    color: '#000',
+    weight: 1,
+    opacity: 1,
+    fillOpacity: 0.8
+}
+
+const ihe_sube_markers = L.markerClusterGroup();
+
+$.getJSON('/static/data/ihe_subeler.geojson', function (data) {
+    console.log(data);
     // create a new GeoJSON layer and assign it to the suitabilityLayer variable
-    ulasmayanLayer = L.geoJSON(data, {
-        style: function (feature) {
-            var gridcode = feature.properties.gridcode;
-            var fillColor;
-
-            if (gridcode === 0) {
-                fillColor = 'purple'
-            } else if (gridcode === 1) {
-                fillColor = '#ffffb2';
-            } else if (gridcode === 2) {
-                fillColor = '#fecc5c';
-            } else if (gridcode === 3) {
-                fillColor = '#fd8d3c';
-            } else if (gridcode === 4) {
-                fillColor = '#f03b20';
-            }
-            return {
-                color: '#000',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9,
-                fillColor: fillColor
-            };
-        }
+    iheSubelerLayer = L.geoJSON(data, {
+        onEachFeature: function (feature, layer) {
+            const popupContent =
+                '<h4 class = "text-primary">BÜFE BİLGİLERİ</h4>' +
+                '<div class="container"><table class="table table-striped">' +
+                "<thead><tr><th>ÖZELLİK</th><th>ÖZELLİK DEĞERİ</th></tr></thead>" +
+                "<tbody><tr><td> İSİM: </td><td>" +
+                feature.properties.NAME +
+                "</td></tr>" +
+                "<tr><td>İLÇE: </td><td>" +
+                feature.properties.ILCE +
+                "</td></tr>" +
+                "<tr><td> MAHALLE: </td><td>" +
+                feature.properties.MAHALLE +
+                "</td></tr>" +
+                "<tr><td> TOPLAM İŞYERİ: </td><td>" +
+                feature.properties.TOPLAM_ISY +
+                "</td></tr>" +
+                "<tr><td> TOPLAM KİŞİ: </td><td>" +
+                feature.properties.TOPLAM_KIS +
+                "</td></tr>" +
+                "<tr><td> TOPLAM KONUT: </td><td>" +
+                feature.properties.TOPLAM_KON +
+                "</td></tr>" +
+                "<tr><td> TOPLAM YAPI: </td><td>" +
+                feature.properties.TOPLAM_YAP +
+                "</td></tr>";
+            layer.bindPopup(popupContent);
+        },
+        pointToLayer: function (feature, latlng) {
+            return ihe_sube_markers.addLayer(L.circleMarker(latlng, geojsonMarkerOptions))
+        },
     });
 });
 
 // define the altmisLayer variable outside of the callback function
 var altmisLayer;
 
-$.getJSON('/static/ALTMIS_YAS_USTU_NUFUS.json', function (data) {
+$.getJSON('/static/data/mahalle_bilgileri.geojson', function (data) {
+    // console.log("mah_nufus:", data);
     // create a new GeoJSON layer and assign it to the suitabilityLayer variable
     altmisLayer = L.geoJSON(data, {
         style: function (feature) {
-            var gridcode = feature.properties.gridcode;
+            var nufus = feature.properties.NUFUS;
+            // console.log("nufus:", nufus)
             var fillColor;
+            if (nufus === null) {
+                nufus = 0;
+            }
+            else{
 
-            if (gridcode === 0) {
-                fillColor = '#f2f0f7'
-            } else if (gridcode === 1) {
-                fillColor = '#dadaeb';
-            } else if (gridcode === 2) {
-                fillColor = '#bcbddc';
-            } else if (gridcode === 3) {
-                fillColor = '#9e9ac8';
-            } else if (gridcode === 4) {
-                fillColor = '#756bb1';
-            } else if (gridcode === 5) {
-                fillColor = '#54278f';
+                if (parseInt(nufus) <= 6816) {
+                    fillColor = '#FFFFCC'
+                }
+                else if (parseInt(nufus) <= 16828) {
+                    fillColor = '#FEE187';
+                }
+                else if (parseInt(nufus) <= 27580) {
+                    fillColor = '#FEAB49';
+                }
+                else if (parseInt(nufus) <= 40383) {
+                    fillColor = '#FC5B2E';
+                }
+                else if (parseInt(nufus) <= 59083) {
+                    fillColor = '#D41020';
+                }
+                else if (parseInt(nufus) <= 111646) {
+                    fillColor = '#800026';
+                }
+                else{
+                }
             }
             return {
                 color: '#000',
@@ -349,97 +401,7 @@ $.getJSON('/static/ALTMIS_YAS_USTU_NUFUS.json', function (data) {
                 fillOpacity: 0.6,
                 fillColor: fillColor
             };
-        }
-    });
-});
 
-// define the mahNufusLayer variable outside of the callback function
-var mahNufusLayer;
-
-$.getJSON('/static/Mah_Nufus.json', function (data) {
-    console.log(data); // log the GeoJSON data
-    // create a new GeoJSON layer and assign it to the suitabilityLayer variable
-    mahNufusLayer = L.geoJSON(data, {
-        style: function (feature) {
-            var gridcode = feature.properties.gridcode;
-            var fillColor;
-
-            if (gridcode === 0) {
-                fillColor = 'purple'
-            } else if (gridcode === 1) {
-                fillColor = 'black';
-            } else if (gridcode === 2) {
-                fillColor = 'yellow';
-            } else if (gridcode === 3) {
-                fillColor = 'red';
-            } else if (gridcode === 4) {
-                fillColor = 'orange';
-            }
-            return {
-                color: '#000',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9,
-                fillColor: fillColor
-            };
-        }
-    });
-});
-
-// define the sesLayer variable outside of the callback function
-var sesLayer;
-
-$.getJSON('/static/SES.json', function (data) {
-    console.log(data); // log the GeoJSON data
-    // create a new GeoJSON layer and assign it to the suitabilityLayer variable
-    sesLayer = L.geoJSON(data, {
-        style: function (feature) {
-            var gridcode = feature.properties.gridcode;
-            var fillColor;
-
-            if (gridcode === 0) {
-                fillColor = 'purple'
-            } else if (gridcode === 1) {
-                fillColor = 'black';
-            } else if (gridcode === 2) {
-                fillColor = 'yellow';
-            } else if (gridcode === 3) {
-                fillColor = 'red';
-            } else if (gridcode === 4) {
-                fillColor = 'orange';
-            }
-            return {
-                color: '#000',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9,
-                fillColor: fillColor
-            };
-        }
-    });
-});
-
-// define the sesLayer variable outside of the callback function
-var mah_layer;
-
-$.getJSON('/static/mah_layer.geojson', function (data) {
-    console.log(data); // log the GeoJSON data
-    // create a new GeoJSON layer and assign it to the suitabilityLayer variable
-    mah_layer = L.geoJSON(data, {
-        style: function (feature) {
-            var gridcode = feature.properties.ILCEKN;
-            var fillColor;
-            if (gridcode === 1782) {
-                fillColor = 'purple'
-            }
-
-            return {
-                color: '#000',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.9,
-                fillColor: fillColor
-            };
         }
     });
 });
@@ -454,54 +416,67 @@ var toggleCount = 0
 // add an event listener to the button
 toggleLayerBtn.addEventListener('click', function () {
 
-    if (toggleCount == 0) {
-        buttonContainerThird.style.top = "325px"
+    if (toggleCount === 0) {
+        buttonContainerThird.style.top = "200px"
         buttonContainerSecond.style.left = "20px";
         toggleCount += 1
-    } else if (buttonContainerThird.style.top == "325px") {
-        console.log("1")
+        if (!map.hasLayer(suitabilityLayer)) {
+            suitabilityLayer.addTo(map);
+
+            legend.onAdd = function (map) {
+                var div = L.DomUtil.create('div', 'info legend');
+                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Suitability Legend</h4>';
+                div.innerHTML += '<i style="background-color: #F3F3E2; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style=" margin:2px;">Uygun Degil</span><br>';
+                div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Az Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Daha Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">En Uygun</span><br>';
+                return div;
+            };
+
+            // add the legend control to the map
+            legend.addTo(map); // add the legend control to the map
+        }
+    } else if (buttonContainerThird.style.top === "200px") {
+        // console.log("1")
         buttonContainerSecond.style.left = "-60px"
         buttonContainerThird.style.top = "120px"
+        if (map.hasLayer(suitabilityLayer)) {
+            // console.log("3")
+            map.removeLayer(suitabilityLayer);
+            map.removeControl(legend);
+        }
     } else {
-        console.log("2")
-        buttonContainerThird.style.top = "325px"
+        // console.log("2")
+        buttonContainerThird.style.top = "200px"
         buttonContainerSecond.style.left = "20px";
+        if (!map.hasLayer(suitabilityLayer)) {
+            suitabilityLayer.addTo(map);
+
+            legend.onAdd = function (map) {
+                var div = L.DomUtil.create('div', 'info legend');
+                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Suitability Legend</h4>';
+                div.innerHTML += '<i style="background-color: #F3F3E2; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style=" margin:2px;">Uygun Degil</span><br>';
+                div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Az Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Daha Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">En Uygun</span><br>';
+                return div;
+            };
+
+            // add the legend control to the map
+            legend.addTo(map); // add the legend control to the map
+        }
     }
 
+    try {
+        map.removeLayer(iheSubelerLayer);
+        map.removeLayer(altmisLayer);
+        map.removeControl(legend1);
+        map.removeControl(legend2);
 
-    if (map.hasLayer(suitabilityLayer)) {
-        // if the layer is currently visible, remove it from the map
-        map.removeLayer(suitabilityLayer);
-        map.removeControl(legend); // remove the legend control from the map
-    } else {
-        // if the layer is currently hidden, add it to the map
-        try {
-            map.removeLayer(ulasmayanLayer);
-            map.removeLayer(altmisLayer);
-            map.removeLayer(mahNufusLayer);
-            map.removeLayer(sesLayer);
-            map.removeControl(legend1);
-            map.removeControl(legend2);
-            map.removeControl(legend3);
-            map.removeControl(legend4);
-        } catch {
-            console.log("Could not delete")
-        }
-        suitabilityLayer.addTo(map);
-        // define the contents of the legend
-        legend.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Suitability Legend</h4>';
-            div.innerHTML += '<i style="background-color: #F3F3E2; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style=" margin:2px;">Uygun Degil</span><br>';
-            div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Az Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Daha Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">En Uygun</span><br>';
-            return div;
-        };
-
-        // add the legend control to the map
-        legend.addTo(map); // add the legend control to the map
+    } catch {
+        // console.log("Could not delete")
     }
 });
 
@@ -513,25 +488,24 @@ var toggleLayerBtn1 = document.getElementById('toggle-layer1');
 
 // add an event listener to the button
 toggleLayerBtn1.addEventListener('click', function () {
-    if (map.hasLayer(ulasmayanLayer)) {
+    if (map.hasLayer(iheSubelerLayer)) {
         // if the layer is currently visible, remove it from the map
-        map.removeLayer(ulasmayanLayer);
+        map.removeLayer(iheSubelerLayer);
         map.removeControl(legend1); // remove the legend control from the map
     } else {
         try {
             map.removeLayer(suitabilityLayer);
             map.removeLayer(altmisLayer);
-            map.removeLayer(mahNufusLayer);
-            map.removeLayer(sesLayer);
             map.removeControl(legend);
             map.removeControl(legend2);
-            map.removeControl(legend3);
-            map.removeControl(legend4);
+
         } catch {
-            console.log("Could not delete")
+            // console.log("Could not delete")
         }
         // if the layer is currently hidden, add it to the map
-        ulasmayanLayer.addTo(map);
+        iheSubelerLayer.addTo(map);
+        map.addLayer(ihe_sube_markers);
+
         // define the contents of the legend
         legend1.onAdd = function (map) {
             var div = L.DomUtil.create('div', 'info legend');
@@ -561,14 +535,11 @@ toggleLayerBtn2.addEventListener('click', function () {
         map.removeControl(legend2); // remove the legend control from the map
     } else {
         try {
-            map.removeLayer(ulasmayanLayer);
+            map.removeLayer(iheSubelerLayer);
             map.removeLayer(suitabilityLayer);
-            map.removeLayer(mahNufusLayer);
-            map.removeLayer(sesLayer);
             map.removeControl(legend);
             map.removeControl(legend1);
-            map.removeControl(legend3);
-            map.removeControl(legend4);
+
         } catch {
             console.log("Could not delete")
         }
@@ -586,132 +557,6 @@ toggleLayerBtn2.addEventListener('click', function () {
 
         // add the legend control to the map
         legend2.addTo(map); // add the legend control to the map
-    }
-});
-
-// create a custom control for the legend
-var legend3 = L.control({position: 'bottomright'});
-
-// get the toggle layer button element
-var toggleLayerBtn3 = document.getElementById('toggle-layer3');
-
-// add an event listener to the button
-toggleLayerBtn3.addEventListener('click', function () {
-    if (map.hasLayer(mahNufusLayer)) {
-        // if the layer is currently visible, remove it from the map
-        map.removeLayer(mahNufusLayer);
-        map.removeControl(legend3); // remove the legend control from the map
-    } else {
-        // if the layer is currently hidden, add it to the map
-        try {
-            map.removeLayer(ulasmayanLayer);
-            map.removeLayer(altmisLayer);
-            map.removeLayer(sesLayer);
-            map.removeLayer(suitabilityLayer);
-            map.removeControl(legend);
-            map.removeControl(legend1);
-            map.removeControl(legend2);
-            map.removeControl(legend4);
-        } catch {
-            console.log("Could not delete")
-        }
-        mahNufusLayer.addTo(map);
-        // define the contents of the legend
-        legend3.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
-            div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
-            div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
-            return div;
-        };
-
-        // add the legend control to the map
-        legend3.addTo(map); // add the legend control to the map
-    }
-});
-
-// create a custom control for the legend
-var legend4 = L.control({position: 'bottomright'});
-
-// get the toggle layer button element
-var toggleLayerBtn4 = document.getElementById('toggle-layer4');
-
-// add an event listener to the button
-toggleLayerBtn4.addEventListener('click', function () {
-    if (map.hasLayer(sesLayer)) {
-        // if the layer is currently visible, remove it from the map
-        map.removeLayer(sesLayer);
-        map.removeControl(legend4); // remove the legend control from the map
-    } else {
-        // if the layer is currently hidden, add it to the map
-        try {
-            map.removeLayer(ulasmayanLayer);
-            map.removeLayer(altmisLayer);
-            map.removeLayer(mahNufusLayer);
-            map.removeLayer(suitabilityLayer);
-            map.removeControl(legend);
-            map.removeControl(legend1);
-            map.removeControl(legend2);
-            map.removeControl(legend3);
-        } catch {
-            console.log("Could not delete")
-        }
-        sesLayer.addTo(map);
-        // define the contents of the legend
-        legend4.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
-            div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
-            div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
-            return div;
-        };
-
-        // add the legend control to the map
-        legend4.addTo(map); // add the legend control to the map
-    }
-});
-
-// create a custom control for the legend
-var legend5 = L.control({position: 'bottomright'});
-
-// get the toggle layer button element
-var toggleLayerBtn5 = document.getElementById('toggle-layer5');
-
-// add an event listener to the button
-toggleLayerBtn5.addEventListener('click', function () {
-    if (map.hasLayer(mah_layer)) {
-        // if the layer is currently visible, remove it from the map
-        map.removeLayer(mah_layer);
-        map.removeControl(legend5); // remove the legend control from the map
-    } else {
-        // if the layer is currently hidden, add it to the map
-        try {
-            map.removeLayer(ulasmayanLayer);
-            map.removeLayer(altmisLayer);
-            map.removeLayer(mahNufusLayer);
-            map.removeLayer(suitabilityLayer);
-            map.removeControl(legend);
-            map.removeControl(legend1);
-            map.removeControl(legend2);
-            map.removeControl(legend3);
-        } catch {
-            console.log("Could not delete")
-        }
-        mah_layer.addTo(map);
-        // define the contents of the legend
-        legend5.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
-            div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
-            div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
-            return div;
-        };
-
-        // add the legend control to the map
-        legend5.addTo(map); // add the legend control to the map
     }
 });
 
@@ -804,6 +649,7 @@ map.on('draw:created', function (e) {
                         '<br><b class="popup-el">İlçe İhe Büfe Sayısı:</b> ' + response['ilce_ihe_bufe_sayisi'] +
                         '<br><b class="popup-el">Mahalle İhe Büfe Sayısı:</b> ' + response['mahalle_ihe_bufe_sayisi'] +
                         '<br><button id="potential-sale-info" onclick="showInfo()"><ion-icon name="information-circle-sharp" style="cursor:pointer" ></ion-icon></button>' + '<b class="popup-el">Potansiyel Satış:</b> ' + response['potansiyel_satis'] +
+                        '<br><b class="popup-el">Adres:</b> ' + response['adres'] +
                         '<br><a href="https://www.google.com/maps?layer=c&cbll=' +
                         String(latlng.lat.toFixed(6)) + ',' + String(latlng.lng.toFixed(6)) + '" target="blank"><img id="google-street-view-pic" src="https://images2.imgbox.com/54/82/bXyXnV9Z_o.png" ></a>'
                     );
@@ -916,20 +762,19 @@ map.on('draw:created', function (e) {
 
             if (legendMarkers) {
                 // Remove the existing legend control from the map
-                console.log("burak")
                 map.removeControl(legendMarkers);
             }
             var highestValue = Math.max.apply(Math, locationValuesList);
-            console.log("highest", highestValue)
+            // console.log("highest", highestValue)
             if (highestValue > 0) {
                 var totalMarkerCount = locationValuesList.length
                 var colorIncrementFactor = parseInt(256 / totalMarkerCount)
-                console.log("colorInFac", colorIncrementFactor)
+                // console.log("colorInFac", colorIncrementFactor)
                 locationValuesList.sort(function (a, b) {
                     return a - b;
                 });
 
-                console.log("locationvaluelist:", locationValuesList)
+                // console.log("locationvaluelist:", locationValuesList)
 
                 // Loop through each layer in the drawnItems feature group
                 drawnItems.eachLayer(function (layer) {
@@ -947,11 +792,10 @@ map.on('draw:created', function (e) {
                         }));
 
                         var currentIndex = locationValuesList.indexOf(locationValue) + 1
-                        console.log("currentIndex", currentIndex)
+                        // console.log("currentIndex", currentIndex)
                         var customIcon = layer._icon;
                         customIcon.style.backgroundColor = `rgb(255, ${255 - (currentIndex * colorIncrementFactor)}, 0)`
                         customIcon.style.borderRadius = "50px";
-                        console.log("aa")
 
                         // If the location value matches the highest value, add a custom marker icon
                         if (locationValue === highestValue) {
@@ -1049,7 +893,7 @@ deleteSelectedFeatureButton.addEventListener('click', function () {
     if (checkerDeleteSelectedFeature % 2 === 0) {
         if (tutorialButtonChecker % 2 === 0) {
             clickManage()
-            checkerDeleteSelectedFeature+= 1
+            checkerDeleteSelectedFeature += 1
         } else {
             tutorialGifContainerDsf.style.display = 'block';
             darkScreen.style.display = 'block'
@@ -1063,7 +907,7 @@ deleteSelectedFeatureButton.addEventListener('click', function () {
         deleteSelectedFeatureButton.style.backgroundColor = "#F0F0F0"
         deleteSelectedFeatureButton.style.color = "black"
         deleteSelectedFeatureButton.style.fontSize = "18px";
-        checkerDeleteSelectedFeature+= 1
+        checkerDeleteSelectedFeature += 1
     }
 });
 
@@ -1096,7 +940,7 @@ function clickManage() {
         marker.on('click', function (event) {
             if (isClickManageActive) {
                 for (var i = 0; i < drawnItems.getLayers().length; i++) {
-                    console.log(drawnItems.getLayers()[i]._latlng)
+                    // console.log(drawnItems.getLayers()[i]._latlng)
                     if (marker._latlng === drawnItems.getLayers()[i]._latlng) {
                         // Perform any desired actions when a marker is clicked
                         var currentMarker = drawnItems.getLayers()[i]
@@ -1130,7 +974,7 @@ var deleteButton = document.getElementById('delete-features');
 
 // Add a click event listener to the button
 deleteButton.addEventListener('click', function () {
-    if (deletePopup.style.display == 'block') {
+    if (deletePopup.style.display === 'block') {
         deletePopup.style.display = 'none'
     } else {
         deletePopup.style.display = 'block'

@@ -62,14 +62,27 @@ def save_points():
     # print(points)  # do something with the points data here
     # center point provided by the user
     point = Point(points['geometry']['coordinates'][0], points['geometry']['coordinates'][1])
+
+    import requests
+
+    api_url = 'http://10.6.128.105:7000/address_geocode/'
+
+    search_param = {'search': ""}
+    search_param.update({'search': "{},{}".format(points['geometry']['coordinates'][0], points['geometry']['coordinates'][1])})
+    if len(search_param['search']) > 0:
+        data_reverse_geocoding_result = requests.get(url=api_url, params=search_param).json()
+    else:
+        data_reverse_geocoding_result = ""
+        return data_reverse_geocoding_result
+
     # Create a buffer around the Point object with a radius of 20 meters
     polygon = point.buffer(0.0002)  # 0.0002 is roughly equivalent to 20 meters
 
-    with open('./static/IHE_UYGUNLUK_YENI.geojson', 'r',
+    with open('./static/data/ihe_uygunluk.geojson', 'r',
               encoding='utf-8') as f:
         ihe_uygunluk_geojson = json.load(f)
 
-    with open('./static/ALLFEATURES_NEW2.geojson', 'r', encoding='utf-8') as f:
+    with open('./static/data/mahalle_bilgileri.geojson', 'r', encoding='utf-8') as f:
         mahalle_geojson = json.load(f)
 
     mah_ad = ""
@@ -224,7 +237,8 @@ def save_points():
             'yapi_sayisi': yapi_sayisi,
             'ilce_ihe_bufe_sayisi': ilce_ihe_bufe_sayisi,
             'mahalle_ihe_bufe_sayisi': mahalle_ihe_bufe_sayisi,
-            'potansiyel_satis': potansiyel_satis
+            'potansiyel_satis': potansiyel_satis,
+            'adres': data_reverse_geocoding_result['result'][0]['name']
 
         }
 
@@ -342,7 +356,8 @@ def save_points():
                     'yapi_sayisi': yapi_sayisi,
                     'ilce_ihe_bufe_sayisi': ilce_ihe_bufe_sayisi,
                     'mahalle_ihe_bufe_sayisi': mahalle_ihe_bufe_sayisi,
-                    'potansiyel_satis': potansiyel_satis
+                    'potansiyel_satis': potansiyel_satis,
+                    'adres': data_reverse_geocoding_result['result'][0]['name']
                 }
                 break
         if thereIsAPolygon == 0:
@@ -363,7 +378,8 @@ def save_points():
                 'yapi_sayisi': " ",
                 'ilce_ihe_bufe_sayisi': "",
                 'mahalle_ihe_bufe_sayisi': "",
-                'potansiyel_satis': ""
+                'potansiyel_satis': "",
+                'adres': ""
             }
 
         lokasyon_list = list()

@@ -15,6 +15,10 @@
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <script src="https://kit.fontawesome.com/f342b71bc7.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="../static/style.css">
+    <link rel="stylesheet" href="../static/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="../static/dist/MarkerCluster.Default.css">
+    <script src="../static/dist/leaflet.markercluster.js"></script>
+
 </head>
 
 <body>
@@ -33,14 +37,15 @@
 
 <div id="tutorial-gif-container">
     <button id="close-gif-button">X</button>
-    <img src=".\static\tutorial_delete_selected_feature.gif" alt="delete-selected-feature-gif" width="100%">
+    <img src=".\static\images\tutorial_delete_selected_feature.gif" alt="delete-selected-feature-gif" width="100%">
 </div>
 
 <div id="potential-info">
     <div id="potential-info-container">
         <div id="potential-info-container-positioner"><a onclick="closePotentialInfo()" href="#">X</a></div>
         <div>
-            &nbsp;&nbsp;&nbsp;&nbsp;Potansiyel satışı elde etmek için ekmek satış verileri bağımlı değişken, erişilebilen nüfus verileri ise
+            &nbsp;&nbsp;&nbsp;&nbsp;Potansiyel satışı elde etmek için ekmek satış verileri bağımlı değişken,
+            erişilebilen nüfus verileri ise
             bağımsız değişken olarak kullanıldı.
             Model eğitimi için veri seti kullanıldı ve test setinde erişilebilen nüfus verileri kullanılarak potansiyel
             satış tahminlemesi yapıldı.
@@ -50,7 +55,8 @@
             değişebileceğini anlamak için önemli bir araçtır.
             <br>
             <br>
-            &nbsp;&nbsp;&nbsp;&nbsp;Potansiyel satışı elde etmek için mahalle bazında ekmek satış verileri ile erişebilen yapı nüfusu verilerine
+            &nbsp;&nbsp;&nbsp;&nbsp;Potansiyel satışı elde etmek için mahalle bazında ekmek satış verileri ile
+            erişebilen yapı nüfusu verilerine
             sahip mahalleler kullanılarak
             bir tahminleme işlemi gerçekleştirildi. K-means algoritması kullanılarak, sadece erişebilen yapı nüfusu
             verilerine sahip olan mahallelerin ekmek
@@ -71,10 +77,10 @@
 
 <div id="search-bar-container">
     <form onsubmit="submitForm(event)">
-        <input type="text" placeholder="Adress Giriniz" id="search-bar-input" name="search-bar-input">
+        <input type="text" placeholder="Adres Giriniz" id="search-bar-input" name="search-bar-input">
         <a id="clear-address">X</a>
         <button type="submit" id="submit-button">
-            <ion-icon name="search-sharp" style="font-size: 19px"></ion-icon>
+            <ion-icon name="search-sharp" style="font-size: 20px"></ion-icon>
         </button>
     </form>
     <div id="result-container"></div>
@@ -110,15 +116,6 @@
     <button title="60 Yaş Üstü Katmanı" id="toggle-layer2">
         <ion-icon name="layers"></ion-icon>
     </button>
-    <button title="Mahalle Nüfus Katmanı" id="toggle-layer3">
-        <ion-icon name="layers"></ion-icon>
-    </button>
-    <button title="Ses Katmanı" id="toggle-layer4">
-        <ion-icon name="layers"></ion-icon>
-    </button>
-    <button title="Mahalle Katmanı" id="toggle-layer5">
-        <ion-icon name="layers"></ion-icon>
-    </button>
 </div>
 
 <div id="button-container-third">
@@ -137,11 +134,10 @@
     <button title="Tüm Konum Özelliklerini Kaydet" id="save-features">
         <i class="fa fa-solid fa-download"></i>
     </button>
-        <button title="Ön İzlemeleri Aç/Kapa" id="activate-tutorials">
-        <ion-icon style= "font-size: 20px" name="information-circle-sharp"></ion-icon>
+    <button title="Ön İzlemeleri Aç/Kapa" id="activate-tutorials">
+        <i class="fas fa-info-circle"></i>
     </button>
 </div>
-
 
 <div id="table-container">
     <table id="marker-table">
@@ -205,6 +201,9 @@
     </div>
     <div class="item-container">
         <i class="fa fa-solid fa-download"></i> - Bu buton haritadaki konumları kaydetmek için kullanılır.
+    </div>
+    <div class="item-container">
+        <i class="fas fa-info-circle"></i> - Bu buton diğer butonların kullanımı hakkında bilgi almak için kullanılır.
     </div>
     <p class="created-by">Coğrafi Bilgi Sistemi Şube Müdürlüğü tarafından 💖 ile yapıldı.</p>
 </div>
