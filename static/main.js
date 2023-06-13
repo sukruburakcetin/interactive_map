@@ -61,7 +61,24 @@ function submitForm(event) {
                 // Create a closure to capture the address values
                 (function (lat, lng) {
                     addressElement.onclick = function zoomTo() {
-                        map.setView([lat, lng], 18);
+                        map.setView([lat, lng], 19);
+                    // Custom marker icon
+                    var customIcon = L.icon({
+                        iconUrl: '.\\static\\images\\address_pointer.gif',
+                        iconSize: [32, 32], // Set the size of the image
+                        iconAnchor: [16, 32], // Adjust the anchor point if needed
+                        className: 'custom-icon'
+                    });
+
+
+                    // Add a marker with the custom icon at the specified location
+                    var marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+                    marker.bindPopup(address.name).openPopup();
+                                        // Remove the custom icon after 10 seconds
+                    // Remove the marker after 10 seconds
+                    setTimeout(function () {
+                        map.removeLayer(marker);
+                    }, 6000);
                     };
                 })(address.lat, address.lon);
                 resultContainer.appendChild(addressElement);
@@ -199,7 +216,7 @@ var map = L.map('map', {
     minZoom: 10
 }).setView([41.188806, 28.980162], 10);
 var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
+    maxZoom: 20,
     attribution: 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
 })
 
@@ -230,24 +247,24 @@ var openTopoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
     subdomains: ['a', 'b', 'c']
 })
 
-var rehberVTGrayLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/RehberGrayMap/MapServer/tile/{z}/{y}/{x}', {
+var rehberVTGrayLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/Rehber/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'İstanbul Büyükşehir Belediyesi©',
     subdomains: 'abcd',
     minZoom: 0,
-    maxZoom: 19
+    maxZoom: 20
 });
 
 var rehberVTDarkLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/RehberDark/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'İstanbul Büyükşehir Belediyesi©',
     subdomains: 'abcd',
     minZoom: 0,
-    maxZoom: 19
+    maxZoom: 20
 })
 var uyduLayer = L.tileLayer('https://cbsaltlik.ibb.gov.tr/arcgis/rest/services/Uydu/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'İstanbul Büyükşehir Belediyesi©',
     subdomains: 'abcd',
     minZoom: 0,
-    maxZoom: 19
+    maxZoom: 20
 });
 
 
@@ -309,7 +326,7 @@ $.getJSON('/static/data/ihe_uygunluk.geojson', function (data) {
 var iheSubelerLayer;
 
 const geojsonMarkerOptions = {
-    radius: 8,
+    radius: 4,
     fillColor: '#ff7800',
     color: '#000',
     weight: 1,
@@ -370,28 +387,21 @@ $.getJSON('/static/data/mahalle_bilgileri.geojson', function (data) {
             var fillColor;
             if (nufus === null) {
                 nufus = 0;
-            }
-            else{
+            } else {
 
                 if (parseInt(nufus) <= 6816) {
                     fillColor = '#FFFFCC'
-                }
-                else if (parseInt(nufus) <= 16828) {
+                } else if (parseInt(nufus) <= 16828) {
                     fillColor = '#FEE187';
-                }
-                else if (parseInt(nufus) <= 27580) {
+                } else if (parseInt(nufus) <= 27580) {
                     fillColor = '#FEAB49';
-                }
-                else if (parseInt(nufus) <= 40383) {
+                } else if (parseInt(nufus) <= 40383) {
                     fillColor = '#FC5B2E';
-                }
-                else if (parseInt(nufus) <= 59083) {
+                } else if (parseInt(nufus) <= 59083) {
                     fillColor = '#D41020';
-                }
-                else if (parseInt(nufus) <= 111646) {
+                } else if (parseInt(nufus) <= 111646) {
                     fillColor = '#800026';
-                }
-                else{
+                } else {
                 }
             }
             return {
@@ -693,14 +703,12 @@ map.on('draw:created', function (e) {
                     console.log("fail_return_log", error);
                 }
             });
-
-
-            whiteScreen.style.display = "none"
         }
 
         addMarkerPopup.style.display = "none"
         setTimeout(function () {
             preLoader.style.display = 'none';
+            whiteScreen.style.display = "none";
         }, 2250);
     })
 
@@ -788,7 +796,6 @@ map.on('draw:created', function (e) {
                         layer.setIcon(new L.Icon({
                             iconUrl: 'https://images2.imgbox.com/a5/a6/MlVf9aUS_o.png',
                             iconSize: [25, 41],
-                            className: 'custom-icon'
                         }));
 
                         var currentIndex = locationValuesList.indexOf(locationValue) + 1

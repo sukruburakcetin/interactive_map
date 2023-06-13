@@ -230,6 +230,11 @@ body {
     text-align: center;
 }
 
+.update-date{
+    text-align: right;
+    font-size: 13px;
+}
+
 .popup .close-btn {
     position: absolute;
     top: 10px;
@@ -464,12 +469,11 @@ body {
 
 #menu {
     position: absolute;
-    height: 45px;
-    width: 45px;
+    height: 50px;
+    width: 50px;
     margin-left: -4px;
     top: 125px;
     z-index: 2;
-    border-radius: 5px;
     background: #035e4d;
     color: #ffffff;
     display: inline-flex;
@@ -480,7 +484,6 @@ body {
     border: none;
     text-decoration: none;
     transition: background 0.2s;
-    z-index: 2;
 }
 
 #menu:hover {
@@ -549,103 +552,47 @@ body {
 }
 
 #toggle-layer {
-    position: absolute;
     top: 10px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #toggle-layer1 {
-    position: absolute;
     top: 50px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #toggle-layer2 {
-    position: absolute;
     top: 90px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #show-table {
-    position: absolute;
     top: 10px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    padding: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #delete-features {
-    position: absolute;
     top: 50px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    padding: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #delete-last-feature {
-    position: absolute;
     top: 90px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    padding: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #delete-selected-feature {
-    position: absolute;
     top: 130px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    padding: 3px;
-    font-family: "Calibri Light";
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #save-features {
-    position: absolute;
     top: 170px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
-    padding: 3px;
-    font-size: 18px;
-    border-radius: 5px;
 }
 
 #activate-tutorials {
-    position: absolute;
     top: 210px;
-    width: 32px;
-    height: 32px;
-    margin: 3px;
+}
+
+.button-properties{
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 5px;
+    margin-left: 1px;
     padding: 3px;
     font-size: 18px;
     border-radius: 5px;
@@ -712,4 +659,12 @@ body {
 #potential-info-container-positioner a {
     text-decoration: none;
     font-size: 15px;
+}
+
+
+.custom-icon {
+    border: 1px solid transparent;
+    border-radius: 50%;
+    background-color: lightblue;
+    top:20px;
 }
