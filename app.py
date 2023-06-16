@@ -219,6 +219,11 @@ def save_points():
         elif 1 < final_suitability_value < 2:
             suitability = "Uygun Değil-Az Uygun"
 
+        try:
+            reversed_geocode_address = data_reverse_geocoding_result['result'][0]['name']
+        except:
+            reversed_geocode_address = ""
+
         # sonra bu degeri marker'a bind edip html tarafında ajax koduyla bu veriyi consume edip ekrana yansıtıyorum
         feature = {
             'type': 'Feature',
@@ -238,7 +243,7 @@ def save_points():
             'ilce_ihe_bufe_sayisi': ilce_ihe_bufe_sayisi,
             'mahalle_ihe_bufe_sayisi': mahalle_ihe_bufe_sayisi,
             'potansiyel_satis': potansiyel_satis,
-            'adres': data_reverse_geocoding_result['result'][0]['name']
+            'adres': reversed_geocode_address
 
         }
 
@@ -338,6 +343,12 @@ def save_points():
                 elif current_gridcode == 8:
                     suitability_condition = "Ormanlık Alan"
 
+                try:
+                    reversed_geocode_address = data_reverse_geocoding_result['result'][0]['name']
+                except:
+                    reversed_geocode_address = ""
+
+
                 # Convert the Shapely Polygon object to a GeoJSON Feature object
                 feature = {
                     'type': 'Feature',
@@ -357,7 +368,7 @@ def save_points():
                     'ilce_ihe_bufe_sayisi': ilce_ihe_bufe_sayisi,
                     'mahalle_ihe_bufe_sayisi': mahalle_ihe_bufe_sayisi,
                     'potansiyel_satis': potansiyel_satis,
-                    'adres': data_reverse_geocoding_result['result'][0]['name']
+                    'adres': reversed_geocode_address
                 }
                 break
         if thereIsAPolygon == 0:

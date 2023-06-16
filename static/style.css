@@ -668,3 +668,7 @@ body {
     background-color: lightblue;
     top:20px;
 }
+
+.marker-legend{
+    width: 175px;
+}

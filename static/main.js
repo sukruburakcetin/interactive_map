@@ -62,23 +62,23 @@ function submitForm(event) {
                 (function (lat, lng) {
                     addressElement.onclick = function zoomTo() {
                         map.setView([lat, lng], 19);
-                    // Custom marker icon
-                    var customIcon = L.icon({
-                        iconUrl: '.\\static\\images\\address_pointer.gif',
-                        iconSize: [32, 32], // Set the size of the image
-                        iconAnchor: [16, 32], // Adjust the anchor point if needed
-                        className: 'custom-icon'
-                    });
+                        // Custom marker icon
+                        var customIcon = L.icon({
+                            iconUrl: '.\\static\\images\\address_pointer.gif',
+                            iconSize: [32, 32], // Set the size of the image
+                            iconAnchor: [16, 32], // Adjust the anchor point if needed
+                            className: 'custom-icon'
+                        });
 
 
-                    // Add a marker with the custom icon at the specified location
-                    var marker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
-                    marker.bindPopup(address.name).openPopup();
-                                        // Remove the custom icon after 10 seconds
-                    // Remove the marker after 10 seconds
-                    setTimeout(function () {
-                        map.removeLayer(marker);
-                    }, 6000);
+                        // Add a marker with the custom icon at the specified location
+                        var marker = L.marker([lat, lng], {icon: customIcon}).addTo(map);
+                        marker.bindPopup(address.name).openPopup();
+                        // Remove the custom icon after 10 seconds
+                        // Remove the marker after 10 seconds
+                        setTimeout(function () {
+                            map.removeLayer(marker);
+                        }, 6000);
                     };
                 })(address.lat, address.lon);
                 resultContainer.appendChild(addressElement);
@@ -709,7 +709,7 @@ map.on('draw:created', function (e) {
         setTimeout(function () {
             preLoader.style.display = 'none';
             whiteScreen.style.display = "none";
-        }, 2250);
+        }, 3300);
     })
 
 
@@ -782,6 +782,25 @@ map.on('draw:created', function (e) {
                     return a - b;
                 });
 
+
+                // // Define an enumeration object
+                // var colorPicker = {
+                //     "#C86F99",
+                //     "#70F47F",
+                //     "#FBB65E",
+                //     "#5FDBF1",
+                //     "#526CE8",
+                //     "#306383",
+                //     "#7B8E45",
+                //     "#C555F7",
+                //     "#975438",
+                //     "#DFF187",
+                //     "#468C78",
+                //     "#FC6963",
+                //     "#F9B4A0",
+                // };
+
+
                 // console.log("locationvaluelist:", locationValuesList)
 
                 // Loop through each layer in the drawnItems feature group
@@ -792,25 +811,49 @@ map.on('draw:created', function (e) {
                         var popupContent = layer.getPopup().getContent();
 
                         var locationValue = parseFloat(popupContent.split('<b class="popup-el">Gridcode:</b> ')[1]);
-
+                        var customIcon = layer._icon;
                         layer.setIcon(new L.Icon({
                             iconUrl: 'https://images2.imgbox.com/a5/a6/MlVf9aUS_o.png',
                             iconSize: [25, 41],
                         }));
+                        customIcon.style.borderRadius = "50%";
 
-                        var currentIndex = locationValuesList.indexOf(locationValue) + 1
-                        // console.log("currentIndex", currentIndex)
-                        var customIcon = layer._icon;
-                        customIcon.style.backgroundColor = `rgb(255, ${255 - (currentIndex * colorIncrementFactor)}, 0)`
-                        customIcon.style.borderRadius = "50px";
+                        if (locationValue === 1) {
+                            customIcon.style.backgroundColor = "#C86F99";
+                        } else if (locationValue < 2) {
+                            customIcon.style.backgroundColor = "#70F47F";
+                        } else if (locationValue === 2) {
+                            customIcon.style.backgroundColor = "#FBB65E";
+                        } else if (locationValue < 3) {
+                            customIcon.style.backgroundColor = "#5FDBF1";
+                        } else if (locationValue === 3) {
+                            customIcon.style.backgroundColor = "#526CE8";
+                        } else if (locationValue < 4) {
+                            customIcon.style.backgroundColor = "#306383";
+                        } else if (locationValue === 4) {
+                            customIcon.style.backgroundColor = "#6108c4";
+                        } else if (locationValue < 5) {
+                            customIcon.style.backgroundColor = "#DFF187";
+                        } else if (locationValue === 5) {
+                            customIcon.style.backgroundColor = "#468C78";
+                        }
+
+                        // customIcon.style.marginLeft = "-32.5px !important";
+                        // customIcon.style.marginTop = "-40.5px !important";
+
+
+                        // var currentIndex = locationValuesList.indexOf(locationValue) + 1
+                        // // console.log("currentIndex", currentIndex)
+                        // var customIcon = layer._icon;
+                        // customIcon.style.backgroundColor = `rgb(255, ${255 - (currentIndex * colorIncrementFactor)}, 0)`
+                        // customIcon.style.borderRadius = "50px";
+
 
                         // If the location value matches the highest value, add a custom marker icon
                         if (locationValue === highestValue) {
                             var marker = layer.setIcon(new L.Icon({
-                                iconUrl: 'https://cdn0.iconfinder.com/data/icons/small-n-flat/24/678111-map-marker-512.png',
-                                iconSize: [64, 64],
-                                iconAnchor: [32, 64],
-                                popupAnchor: [0, -56]
+                                iconUrl: 'https://images2.imgbox.com/a5/a6/MlVf9aUS_o.png',
+                                iconSize: [25, 41],
                             }));
                             marker.bindTooltip('Bu bölge diğerlerine göre daha uygun: ' + locationValue);
                             marker.addTo(map);
@@ -829,14 +872,31 @@ map.on('draw:created', function (e) {
             legendMarkers = L.control({position: 'bottomright'});
 
             legendMarkers.onAdd = function (map) {
-                var div = L.DomUtil.create('div');
-                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Konum Uygunluk Değeri</h4>';
-                div.innerHTML += '<div style="background: rgb(255,255,0); background: linear-gradient(0deg, rgba(255,255,0,1) 0%, rgba(255,0,0,1) 100%); width: 20px; height: 100px; display: inline-block; border: 2px solid black;"></div>' +
-                    '<span style="position:absolute; font-size: 22px; margin-left: 5px; margin-top: -5px">5</span>' +
-                    '<span style=" margin-left:5px; font-size: 22px;">1</span><br>';
+                var div = L.DomUtil.create('div', "marker-legend");
+                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline; font-size: 16px; text-align: center" >Konum Uygunluk Değeri</h4>';
+                div.innerHTML += '<i style="background-color: #C86F99; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">1</span></i><span style="margin:2px; padding:1px; font-size:16px;">&nbsp&nbsp&nbsp&nbspUygun Değil</span><br>';
+                div.innerHTML += '<i style="background-color: #70F47F; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">1-2</span><br>';
+                div.innerHTML += '<i style="background-color: #FBB65E; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">2</span><br>';
+                div.innerHTML += '<i style="background-color: #5FDBF1; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">2-3</span><br>';
+                div.innerHTML += '<i style="background-color: #526CE8; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">3<br>';
+                div.innerHTML += '<i style="background-color: #306383; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">3-4</span><br>';
+                div.innerHTML += '<i style="background-color: #6108c4; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">4</span><br>';
+                div.innerHTML += '<i style="background-color: #DFF187; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">4-5</span><br>';
+                div.innerHTML += '<i style="background-color: #468C78; width: 30px; height: 10px; display: inline-block; border: 2px solid black; margin-top:1px;"></i><span style="margin:2px; padding:1px; font-size:16px;">5</span><span style="margin:2px; padding:1px; font-size:16px;">&nbsp&nbsp&nbsp&nbspÇok Uygun</span><br>';
+                return div;
 
                 return div;
             };
+
+            // legendMarkers.onAdd = function (map) {
+            //     var div = L.DomUtil.create('div');
+            //     div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Konum Uygunluk Değeri</h4>';
+            //     div.innerHTML += '<div style="background: rgb(255,255,0); background: linear-gradient(0deg, rgba(255,255,0,1) 0%, rgba(255,0,0,1) 100%); width: 20px; height: 100px; display: inline-block; border: 2px solid black;"></div>' +
+            //         '<span style="position:absolute; font-size: 22px; margin-left: 5px; margin-top: -5px">5</span>' +
+            //         '<span style=" margin-left:5px; font-size: 22px;">1</span><br>';
+            //
+            //     return div;
+            // };
 
             // add the legend control to the map
             legendMarkers.addTo(map); // add the legend control to the map
