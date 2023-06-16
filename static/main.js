@@ -120,7 +120,7 @@ function scrollMenu() {
         try {
             map.removeLayer(suitabilityLayer)
             map.removeLayer(iheSubelerLayer);
-            map.removeLayer(altmisLayer);
+            map.removeLayer(mahalleBilgileriLayer);
             map.removeControl(legend1);
             map.removeControl(legend2);
 
@@ -211,6 +211,8 @@ tBody.addEventListener("mouseout", function () {
     tBody.style.overflowY = "hidden"
     tHead.style.width = "100%"
 })
+
+var mapSelector = document.getElementById("map");
 
 var map = L.map('map', {
     minZoom: 10
@@ -337,7 +339,7 @@ const geojsonMarkerOptions = {
 const ihe_sube_markers = L.markerClusterGroup();
 
 $.getJSON('/static/data/ihe_subeler.geojson', function (data) {
-    console.log(data);
+    // console.log(data);
     // create a new GeoJSON layer and assign it to the suitabilityLayer variable
     iheSubelerLayer = L.geoJSON(data, {
         onEachFeature: function (feature, layer) {
@@ -375,12 +377,12 @@ $.getJSON('/static/data/ihe_subeler.geojson', function (data) {
 });
 
 // define the altmisLayer variable outside of the callback function
-var altmisLayer;
+var mahalleBilgileriLayer;
 
 $.getJSON('/static/data/mahalle_bilgileri.geojson', function (data) {
     // console.log("mah_nufus:", data);
     // create a new GeoJSON layer and assign it to the suitabilityLayer variable
-    altmisLayer = L.geoJSON(data, {
+    mahalleBilgileriLayer = L.geoJSON(data, {
         style: function (feature) {
             var nufus = feature.properties.NUFUS;
             // console.log("nufus:", nufus)
@@ -388,7 +390,6 @@ $.getJSON('/static/data/mahalle_bilgileri.geojson', function (data) {
             if (nufus === null) {
                 nufus = 0;
             } else {
-
                 if (parseInt(nufus) <= 6816) {
                     fillColor = '#FFFFCC'
                 } else if (parseInt(nufus) <= 16828) {
@@ -412,9 +413,47 @@ $.getJSON('/static/data/mahalle_bilgileri.geojson', function (data) {
                 fillColor: fillColor
             };
 
+        },
+        onEachFeature: function (feature, layer) {
+            layer.on('click', function (event) {
+                // Handle the click event here
+                var clickedFeature = event.target;
+                var properties = clickedFeature.feature.properties;
+                // Access the properties of the clicked feature and perform actions
+                // console.log('Clicked feature:', properties);
+
+                // Example: Display a popup with the clicked feature's information
+                var popupContent =
+                    '<h4 class = "text-primary">MAHALLE BİLGİLERİ</h4>' +
+                    '<div class="container"><table class="table table-striped">' +
+                    "<thead><tr><th>ÖZELLİK</th><th>ÖZELLİK DEĞERİ</th></tr></thead>" +
+                    "<tbody><tr><td> İLÇE AD: </td><td>" +
+                    feature.properties.ILCE_AD +
+                    "</td></tr>" +
+                    "<tr><td> MAHALLE AD: </td><td>" +
+                    feature.properties.MAH_AD +
+                    "</td></tr>" +
+                    "<tr><td> NÜFUS: </td><td>" +
+                    feature.properties.NUFUS +
+                    "</td></tr>" +
+                    "<tr><td> SES SEGMENT: </td><td>" +
+                    feature.properties.SES_SEGMENT +
+                    "</td></tr>" +
+                    "<tr><td> İLÇE BÜFE SAYISI: </td><td>" +
+                    feature.properties.ILCE_IHE_BUFE_SAYISI +
+                    "</td></tr>" +
+                    "<tr><td> MAHALLE BÜFE SAYISI: </td><td>" +
+                    feature.properties.MAHALLE_IHE_BUFE_SAYISI +
+                    "</td></tr>" +
+                    "<tr><td> MEVCUT İHE BÜFE SAYISI: </td><td>" +
+                    feature.properties.MEVCUT_IHE +
+                    "</td></tr>";
+                clickedFeature.bindPopup(popupContent).openPopup();
+            });
         }
     });
 });
+
 
 // create a custom control for the legend
 var legend = L.control({position: 'bottomright'});
@@ -434,13 +473,13 @@ toggleLayerBtn.addEventListener('click', function () {
             suitabilityLayer.addTo(map);
 
             legend.onAdd = function (map) {
-                var div = L.DomUtil.create('div', 'info legend');
-                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Suitability Legend</h4>';
-                div.innerHTML += '<i style="background-color: #F3F3E2; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style=" margin:2px;">Uygun Degil</span><br>';
-                div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Az Uygun</span><br>';
-                div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Uygun</span><br>';
-                div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Daha Uygun</span><br>';
-                div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">En Uygun</span><br>';
+                var div = L.DomUtil.create('div', 'info_suitabilityLayer_legend');
+                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline; font-size: 15px">Uygunluk Durumu</h4>';
+                div.innerHTML += '<i style="background-color: #F3F3E2; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Uygun Degil</span><br>';
+                div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Az Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Daha Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">En Uygun</span><br>';
                 return div;
             };
 
@@ -464,13 +503,13 @@ toggleLayerBtn.addEventListener('click', function () {
             suitabilityLayer.addTo(map);
 
             legend.onAdd = function (map) {
-                var div = L.DomUtil.create('div', 'info legend');
-                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline;">Suitability Legend</h4>';
-                div.innerHTML += '<i style="background-color: #F3F3E2; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style=" margin:2px;">Uygun Degil</span><br>';
-                div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Az Uygun</span><br>';
-                div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Uygun</span><br>';
-                div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">Daha Uygun</span><br>';
-                div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px">En Uygun</span><br>';
+                var div = L.DomUtil.create('div', 'info_suitabilityLayer_legend');
+                div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline; font-size: 15px">Uygunluk Durumu</h4>';
+                div.innerHTML += '<i style="background-color: #F3F3E2; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Uygun Degil</span><br>';
+                div.innerHTML += '<i style="background-color: #fff7bc; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Az Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #fe9929; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #ec7014; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">Daha Uygun</span><br>';
+                div.innerHTML += '<i style="background-color: #8c2d04; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">En Uygun</span><br>';
                 return div;
             };
 
@@ -481,8 +520,8 @@ toggleLayerBtn.addEventListener('click', function () {
 
     try {
         map.removeLayer(iheSubelerLayer);
-        map.removeLayer(altmisLayer);
-        map.removeControl(legend1);
+        map.removeLayer(mahalleBilgileriLayer);
+        // map.removeControl(legend1);
         map.removeControl(legend2);
 
     } catch {
@@ -505,7 +544,7 @@ toggleLayerBtn1.addEventListener('click', function () {
     } else {
         try {
             map.removeLayer(suitabilityLayer);
-            map.removeLayer(altmisLayer);
+            map.removeLayer(mahalleBilgileriLayer);
             map.removeControl(legend);
             map.removeControl(legend2);
 
@@ -516,18 +555,18 @@ toggleLayerBtn1.addEventListener('click', function () {
         iheSubelerLayer.addTo(map);
         map.addLayer(ihe_sube_markers);
 
-        // define the contents of the legend
-        legend1.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
-            div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
-            div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
-            return div;
-        };
-
-        // add the legend control to the map
-        legend1.addTo(map); // add the legend control to the map
+        // // define the contents of the legend
+        // legend1.onAdd = function (map) {
+        //     var div = L.DomUtil.create('div', 'info legend');
+        //     div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
+        //     div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
+        //     div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
+        //     div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+        //     return div;
+        // };
+        //
+        // // add the legend control to the map
+        // legend1.addTo(map); // add the legend control to the map
     }
 });
 
@@ -536,38 +575,50 @@ var legend2 = L.control({position: 'bottomright'});
 
 // get the toggle layer button element
 var toggleLayerBtn2 = document.getElementById('toggle-layer2');
-
+var mahBilgileriChecker = 0;
 // add an event listener to the button
 toggleLayerBtn2.addEventListener('click', function () {
-    if (map.hasLayer(altmisLayer)) {
+    if (map.hasLayer(mahalleBilgileriLayer)) {
+        mahBilgileriChecker = 0;
         // if the layer is currently visible, remove it from the map
-        map.removeLayer(altmisLayer);
+        map.removeLayer(mahalleBilgileriLayer);
         map.removeControl(legend2); // remove the legend control from the map
+        console.log("mahBilgileriChecker if", mahBilgileriChecker)
     } else {
         try {
+            mahBilgileriChecker = 1;
             map.removeLayer(iheSubelerLayer);
             map.removeLayer(suitabilityLayer);
             map.removeControl(legend);
-            map.removeControl(legend1);
+            // map.removeControl(legend1);
 
         } catch {
             console.log("Could not delete")
         }
         // if the layer is currently hidden, add it to the map
-        altmisLayer.addTo(map);
+        mahalleBilgileriLayer.addTo(map);
         // define the contents of the legend
         legend2.onAdd = function (map) {
-            var div = L.DomUtil.create('div', 'info legend');
-            div.innerHTML += '<h4 style="background-color:white; margin: 0;">Suitability Legend</h4>';
-            div.innerHTML += '<i style="background-color: black; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px;">Uygun Değil</span><br>';
-            div.innerHTML += '<i style="background-color: yellow; width: 10px; height: 10px; display: inline-block; "></i><span style=" margin:2px; padding:1px">Az Uygun</span><br>';
-            div.innerHTML += '<i style="background-color: red; width: 10px; height: 10px; display: inline-block; "></i><span style="margin:2px; padding:1px">Uygun</span><br>';
+            var div = L.DomUtil.create('div', 'nufus_info_legend');
+            div.innerHTML += '<h4 style="background-color:white; margin: 5px;text-decoration: underline; font-size: 15px; text-align: center ">Mahalle Nüfus</h4>';
+            div.innerHTML += '<i style="background-color: #FFFFCC; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px"">0-6816</span><br>';
+            div.innerHTML += '<i style="background-color: #FEE187; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">6817-16828</span><br>';
+            div.innerHTML += '<i style="background-color: #FEAB49; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">16829-27580</span><br>';
+            div.innerHTML += '<i style="background-color: #FC5B2E; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">27581-40383</span><br>';
+            div.innerHTML += '<i style="background-color: #D41020; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">40384-59083</span><br>';
+            div.innerHTML += '<i style="background-color: #800026; width: 10px; height: 10px; display: inline-block; border: 2px solid black;"></i><span style="margin:2px; padding:1px; font-size: 15px">59084-111646</span><br>';
             return div;
         };
 
         // add the legend control to the map
         legend2.addTo(map); // add the legend control to the map
     }
+});
+window.addEventListener("click", function (event, layer) {
+    if (mahBilgileriChecker === 1) {
+        // console.log("asdasdsa", layer.getLatLng())
+    }
+
 });
 
 var drawnItems = new L.FeatureGroup();
