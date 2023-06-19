@@ -763,6 +763,17 @@ map.on('draw:created', function (e) {
         }, 3300);
     })
 
+    // Attach click event to parent element and delegate it to the rows
+    $('#marker-table tbody').on('click', 'tr', function () {
+          // Remove selected class from all rows except the clicked one
+        $('#marker-table tbody tr').not(this).css('background-color', 'white');
+        // Add selected class to the clicked row
+        $(this).css('background-color', '#cad7d7');
+        var latitude = $(this).find('td:eq(2)').html();
+        var longitude = $(this).find('td:eq(3)').html();
+        map.setView([latitude, longitude], 19);
+
+    });
 
     popupCancelButtonAdd.addEventListener('click', function () {
         // Handle the case when the layer type is not 'marker'

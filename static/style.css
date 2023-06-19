@@ -314,6 +314,7 @@ body {
 
 #marker-table tbody tr {
     background-color: #ffffff;
+    cursor: pointer;
 }
 
 #marker-table tbody tr td {
@@ -679,4 +680,9 @@ body {
 
 .nufus_info_legend{
     width: 130px;
+}
+
+.selected {
+  background-color: yellow;
+  /* Add any other desired styles for the selected row */
 }
