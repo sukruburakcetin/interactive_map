@@ -19,10 +19,50 @@
     <link rel="stylesheet" href="../static/dist/MarkerCluster.css">
     <link rel="stylesheet" href="../static/dist/MarkerCluster.Default.css">
     <script src="../static/dist/leaflet.markercluster.js"></script>
-
 </head>
 
 <body>
+
+<div id="login-div">
+    <div id="login-item-container">
+        <div id="login-items">
+            <h2>Login Div</h2>
+            <input type="text" placeholder="Mail">
+            <input type="password" placeholder="Sif">
+            <div id="settings-div">
+                <div>
+                    <input type="checkbox">
+                    <label style="color: #6f6e6e">Beni Hatırla</label>
+                </div>
+                <a href="#">Şifremi unuttum</a>
+            </div>
+            <div id="login-buttons-div">
+                <button type="submit">Login</button>
+                <p>Henüz kayıtlı değil misiniz? <a id="get-signup-page">Kayıt ol</a></p>
+            </div>
+        </div>
+    </div>
+    <div id="login-bg">
+        <button id="close-login-page-button">X</button>
+    </div>
+</div>
+
+<div id="signup-div">
+    <div id="signup-item-container">
+        <div id="signup-items">
+            <h2>Signup Div</h2>
+            <input type="text" placeholder="Mail">
+            <input type="text" placeholder="Sif">
+            <div id="signup-buttons-div">
+                <button type="submit">Sign Up</button>
+                <p>Zaten kayıtlı mısınız? <a id="get-login-page">Giriş yap</a></p>
+            </div>
+        </div>
+    </div>
+    <div id="signup-bg">
+        <button>X</button>
+    </div>
+</div>
 
 <div id="pre-loader">
 

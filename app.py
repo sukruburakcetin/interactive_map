@@ -1,3 +1,4 @@
+import http
 import json
 
 import cx_Oracle
@@ -18,12 +19,33 @@ def index():
 def locate_addresses():
     import requests
 
-    api_url = 'http://10.6.128.105:7000/address_geocode/'
+    # api_url = 'http://10.6.128.105:7000/address_geocode/'
+    conn = http.client.HTTPSConnection("api.ibb.gov.tr")
+    payload = json.dumps({
+        "name": "maks",
+        "password": "maks",
+        "expire": 60
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    conn.request("POST", "/geocode/token/", payload, headers)
+    res = conn.getresponse()
+    data_response = res.read()
+    print(data_response.decode("utf-8"))
+    auth_token = json.loads(data_response.decode("utf-8"))['token']
+
+    headers = {
+        'Origin': 'https://geocode.ibb.gov.tr',
+        'Authorization': 'Bearer ' + auth_token
+    }
+
+    api_url = 'https://api.ibb.gov.tr/geocode/address_geocode/'
 
     search_param = {'search': ""}
     search_param.update({'search': request.json.get("search-bar-input")})
     if len(search_param['search']) > 0:
-        data_geocoding_result = requests.get(url=api_url, params=search_param).json()
+        data_geocoding_result = requests.get(url=api_url, params=search_param, headers=headers).json()
         return jsonify(data_geocoding_result)
     else:
         return jsonify({"message": "address is not available"})
@@ -65,12 +87,33 @@ def save_points():
 
     import requests
 
-    api_url = 'http://10.6.128.105:7000/address_geocode/'
+    # api_url = 'http://10.6.128.105:7000/address_geocode/'
+    conn = http.client.HTTPSConnection("api.ibb.gov.tr")
+    payload = json.dumps({
+        "name": "maks",
+        "password": "maks",
+        "expire": 60
+    })
+    headers = {
+        'Content-Type': 'application/json'
+    }
+    conn.request("POST", "/geocode/token/", payload, headers)
+    res = conn.getresponse()
+    data_response = res.read()
+    print(data_response.decode("utf-8"))
+    auth_token = json.loads(data_response.decode("utf-8"))['token']
+
+    headers = {
+        'Origin': 'https://geocode.ibb.gov.tr',
+        'Authorization': 'Bearer ' + auth_token
+    }
+
+    api_url = 'https://api.ibb.gov.tr/geocode/address_geocode/'
 
     search_param = {'search': ""}
     search_param.update({'search': "{},{}".format(points['geometry']['coordinates'][0], points['geometry']['coordinates'][1])})
     if len(search_param['search']) > 0:
-        data_reverse_geocoding_result = requests.get(url=api_url, params=search_param).json()
+        data_reverse_geocoding_result = requests.get(url=api_url, params=search_param, headers=headers).json()
     else:
         data_reverse_geocoding_result = ""
         return data_reverse_geocoding_result
